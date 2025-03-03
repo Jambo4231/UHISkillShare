@@ -28,7 +28,7 @@ export default function CreateNewJob() {
       status: 1, // Default to 'unresolved'
       userid: "test-user", // Replace with actual user ID
     });
-    router.push("/pages/jobs-page"); // Redirect back to jobs page
+    router.push("/jobs-page"); // Redirect back to jobs page
   }
 
   return (
