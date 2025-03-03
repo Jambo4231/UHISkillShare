@@ -1,17 +1,19 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
-/*== STEP 1 ===============================================================
-The section below creates a Todo database table with a "content" field. Try
-adding a new "isDone" field as a boolean. The authorization rule below
-specifies that any user authenticated via an API key can "create", "read",
-"update", and "delete" any "Todo" records.
+/*== Define Job Table Instead of Todo =======================================
+This schema defines the Job database table with fields matching your MySQL 
+schema. The authorization rule allows public API key access (for testing).
 =========================================================================*/
 const schema = a.schema({
-  Todo: a
+  Job: a
     .model({
-      content: a.string(),
+      userid: a.string(), // User ID (Foreign Key equivalent)
+      title: a.string().required(), // Job title (VARCHAR 30)
+      description: a.string().required(), // Job description (VARCHAR 60)
+      deadline: a.date(), // Deadline date (AWSDate)
+      status: a.integer().default(1), // Status (1 = open, 0 = closed)
     })
-    .authorization((allow) => [allow.publicApiKey()]),
+    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -25,6 +27,7 @@ export const data = defineData({
     },
   },
 });
+
 
 /*== STEP 2 ===============================================================
 Go to your frontend source code. From your client-side code, generate a

@@ -12,41 +12,52 @@ Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
 
-export default function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+export default function JobsPage() {
+  const [jobs, setJobs] = useState<Array<Schema["Job"]["type"]>>([]);
 
-  function listTodos() {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
+  function listJobs() {
+    client.models.Job.observeQuery().subscribe({
+      next: (data) => setJobs([...data.items]),
     });
   }
 
   useEffect(() => {
-    listTodos();
+    listJobs();
   }, []);
 
-  function createTodo() {
-    client.models.Todo.create({
-      content: window.prompt("Todo content"),
-    });
+  function createJob() {
+    const title = window.prompt("Enter job title:");
+    const description = window.prompt("Enter job description:");
+    const deadline = window.prompt("Enter deadline (YYYY-MM-DD):");
+    if (title && description && deadline) {
+      client.models.Job.create({
+        title,
+        description,
+        deadline,
+        status: 1, // Default to 'open'
+        userid: "test-user", // Placeholder, replace with actual user ID from authentication
+      });
+    }
   }
 
   return (
     <main>
-      <h1>My todos</h1>
-      <button onClick={createTodo}>+ new</button>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
+      <header>
+        <h1>UHI Skill Share</h1>
+        <button onClick={createJob}>+ New Job</button>
+      </header>
+      <section className="jobs-list">
+        {jobs.map((job) => (
+          <div key={job.id} className="job-card">
+            <h2>{job.title}</h2>
+            <p className="poster">User ID: {job.userid}</p>
+            <p>{job.description}</p>
+            <p className="deadline">Deadline: {job.deadline}</p>
+            <span className={`status ${job.status === 1 ? "open" : "closed"}`}>{job.status === 1 ? "Unresolved" : "Resolved"}</span>
+          </div>
         ))}
-      </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/nextjs/start/quickstart/nextjs-app-router-client-components/">
-          Review next steps of this tutorial.
-        </a>
-      </div>
+      </section>
     </main>
   );
 }
+
