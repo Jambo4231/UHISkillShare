@@ -7,6 +7,7 @@ import "./../app/app.css";
 import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
+import { useRouter } from "next/navigation";
 
 Amplify.configure(outputs);
 
@@ -14,6 +15,7 @@ const client = generateClient<Schema>();
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Array<Schema["Job"]["type"]>>([]);
+  const router = useRouter();
 
   function listJobs() {
     client.models.Job.observeQuery().subscribe({
@@ -25,21 +27,6 @@ export default function JobsPage() {
     listJobs();
   }, []);
 
-  function createJob() {
-    const title = window.prompt("Enter job title:");
-    const description = window.prompt("Enter job description:");
-    const deadline = window.prompt("Enter deadline (YYYY-MM-DD):");
-    if (title && description && deadline) {
-      client.models.Job.create({
-        title,
-        description,
-        deadline,
-        status: 1, // Default to 'open'
-        userid: "test-user", // Placeholder, replace with actual user ID from authentication
-      });
-    }
-  }
-
   return (
     <main className="container">
       <nav className="navbar">
@@ -47,7 +34,7 @@ export default function JobsPage() {
         <div className="nav-links">
           <a href="#">My Jobs</a>
           <a href="#">Notifications</a>
-          <button onClick={createJob}>+ New Job</button>
+          <button onClick={() => router.push("/create-new-job")}>+ New Job</button>
         </div>
       </nav>
       <div className="layout">
