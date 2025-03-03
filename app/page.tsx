@@ -42,34 +42,41 @@ export default function JobsPage() {
 
   return (
     <main className="container">
-      <aside className="sidebar">
-        <h2>Sort by Course/Subject</h2>
-        <ul>
-          <li><input type="checkbox" /> Subject 1</li>
-          <li><input type="checkbox" /> Subject 2</li>
-          <li><input type="checkbox" /> Subject 3</li>
-        </ul>
-      </aside>
-      <section className="content">
-        <header>
-          <h1>UHI Skill Share</h1>
+      <nav className="navbar">
+        <h1>UHI Skill Share</h1>
+        <div className="nav-links">
+          <a href="#">My Jobs</a>
+          <a href="#">Notifications</a>
           <button onClick={createJob}>+ New Job</button>
-        </header>
-        <div className="jobs-list">
-          {jobs.map((job) => (
-            <div key={job.id} className="job-card">
-              <h2>{job.title}</h2>
-              <p className="poster">User: {job.userid} • Subject/Course</p>
-              <p>{job.description}</p>
-              <p className="deadline">Deadline: {job.deadline}</p>
-              <span className={`status ${job.status === 1 ? "open" : "closed"}`}>{job.status === 1 ? "Unresolved" : "Resolved"}</span>
-              <p className="comments">0 Comments</p>
-            </div>
-          ))}
         </div>
-      </section>
+      </nav>
+      <div className="layout">
+        <aside className="sidebar">
+          <h2>Sort by Course/Subject</h2>
+          <ul>
+            <li><input type="checkbox" /> Subject 1</li>
+            <li><input type="checkbox" /> Subject 2</li>
+            <li><input type="checkbox" /> Subject 3</li>
+          </ul>
+        </aside>
+        <section className="content">
+          <div className="jobs-list">
+            {jobs.map((job) => (
+              <div key={job.id} className="job-card">
+                <h2>{job.title}</h2>
+                <p className="poster">User: {job.userid} • Subject/Course</p>
+                <p>{job.description}</p>
+                <p className="deadline">Deadline: {job.deadline}</p>
+                <span className={`status ${job.status === 1 ? "open" : "closed"}`}>{job.status === 1 ? "Unresolved" : "Resolved"}</span>
+                <p className="comments">0 Comments</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
+
 
 
