@@ -1,14 +1,16 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
-/*== Define Job Table Instead of Todo =======================================
+/*== Define Job Table with Subject =======================================
 This schema defines the Job database table with fields matching your MySQL 
-schema. The authorization rule allows public API key access (for testing).
+schema while including the "subject" field. The authorization rule allows 
+public API key access (for testing).
 =========================================================================*/
 const schema = a.schema({
   Job: a
     .model({
       userid: a.string(), // User ID (Foreign Key equivalent)
       title: a.string().required(), // Job title (VARCHAR 30)
+      subject: a.string().required(), // Course or Subject
       description: a.string().required(), // Job description (VARCHAR 60)
       deadline: a.date(), // Deadline date (AWSDate)
       status: a.integer().default(1), // Status (1 = open, 0 = closed)
@@ -27,6 +29,7 @@ export const data = defineData({
     },
   },
 });
+
 
 
 /*== STEP 2 ===============================================================

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
-import "./../app/app.css";
+import "./../pages/app.css";
 import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
@@ -34,7 +34,7 @@ export default function JobsPage() {
         <div className="nav-links">
           <a href="#">My Jobs</a>
           <a href="#">Notifications</a>
-          <button onClick={() => router.push("/create-new-job")}>+ New Job</button>
+          <button onClick={() => router.push("/pages/create-new-job")}>+ New Job</button>
         </div>
       </nav>
       <div className="layout">

@@ -119,3 +119,57 @@ body {
   font-size: 12px;
   color: #666;
 }
+
+/* FORM STYLING FOR CREATE JOB PAGE */
+.form-container {
+  max-width: 600px;
+  margin: 40px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  border-bottom: 2px solid black;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+.required {
+  color: red;
+  margin-left: 5px;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+textarea {
+  height: 100px;
+}
+
+button[type="submit"] {
+  display: block;
+  width: 100%;
+  background: black;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background: #333;
+}
