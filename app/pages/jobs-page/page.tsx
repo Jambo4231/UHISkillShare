@@ -34,8 +34,8 @@ export default function JobsPage() {
         <div className="nav-links">
           <a href="#">My Jobs</a>
           <a href="#">Notifications</a>
-          <button onClick={() => router.push("/pages/create-new-job")}>+ New Job</button>
-        </div>
+          <button onClick={() => router.push("/create-new-job")}>+ New Job</button>
+          </div>
       </nav>
       <div className="layout">
         <aside className="sidebar">
