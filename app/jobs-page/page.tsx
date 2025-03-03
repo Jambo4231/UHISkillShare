@@ -17,21 +17,27 @@ export default function JobsPage() {
   const [jobs, setJobs] = useState<Array<Schema["Job"]["type"]>>([]);
   const router = useRouter();
 
-  function listJobs() {
-    console.log("Amplify Client Models:", client.models);
-  
+  async function listJobs() {
     if (!client.models?.Job) {
-      console.error("Job model is not available in Amplify Data!");
+      console.error("Job model is not available.");
       return;
     }
   
-    client.models.Job.observeQuery().subscribe({
-      next: (data) => {
-        console.log("Jobs data:", data.items);
-        setJobs([...data.items]);
-      },
-      error: (err) => console.error("Error fetching jobs:", err),
-    });
+    try {
+      const { data } = await client.models.Job.list();
+      console.log("Jobs data received:", data);
+  
+      // Check if any jobs are missing the subject field
+      data.forEach((job) => {
+        if (!job.subject) {
+          console.error(`Job with ID ${job.id} is missing a subject!`, job);
+        }
+      });
+  
+      setJobs(data);
+    } catch (err) {
+      console.error("Error fetching jobs:", err);
+    }
   }
   
 
