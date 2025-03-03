@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
-import "./app.css";
+import "../app.css";
 import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
@@ -18,10 +18,22 @@ export default function JobsPage() {
   const router = useRouter();
 
   function listJobs() {
+    console.log("Amplify Client Models:", client.models);
+  
+    if (!client.models?.Job) {
+      console.error("Job model is not available in Amplify Data!");
+      return;
+    }
+  
     client.models.Job.observeQuery().subscribe({
-      next: (data) => setJobs([...data.items]),
+      next: (data) => {
+        console.log("Jobs data:", data.items);
+        setJobs([...data.items]);
+      },
+      error: (err) => console.error("Error fetching jobs:", err),
     });
   }
+  
 
   useEffect(() => {
     listJobs();
