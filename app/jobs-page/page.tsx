@@ -42,6 +42,9 @@ export default function JobsPage() {
  
   //Test 1 2 3
 
+  <p style={{ color: "red", fontWeight: "bold" }}>🚀 Auto-build Test 🚀</p>
+
+
   useEffect(() => {
     listJobs();
   }, []);
