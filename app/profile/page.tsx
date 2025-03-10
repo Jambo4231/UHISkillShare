@@ -29,30 +29,34 @@ export default function CreateNewJob() {
       <div className="max-w-4xl mx-auto bg-white shadow-md p-6 mt-6 rounded-lg">
         <div className="flex gap-6">
           {/* Profile Picture */}
-          <div className="w-32 h-32 bg-gray-700 rounded-full flex items-center justify-center text-white text-sm">
-            Profile Picture
-          </div>
+			<div className="profile-header">
+		{/* Profile Picture */}
+			<div className="profile-picture">
+			  Profile Picture
+        </div>
           
           {/* User Info */}
-          <div className="flex-1">
-            <p className="text-gray-700 font-semibold">Screen Name:</p>
-            <div className="bg-gray-300 text-gray-700 p-2 rounded">Pull User name from database</div>
+          <div className="user-info">
+          <p>Screen Name:</p>
+          <div className="user-name">Pull User name from database</div>
+
             
             {/* User Ratings Create table for ratings of jobs done and comments. a rating should range from 1-5 and reference the id of the entry and the users. Calculate the mean of all ratings for user and display them here*/}
-            <p className="text-gray-700 mt-2">User Rating:</p>
-            <div className="text-lg">⭐⭐⭐★★</div>
+            <p>User Rating:</p>
+          <div className="stars">⭐⭐⭐★★</div>
 
-            <p className="text-gray-700 mt-2">Average Comment Rating:</p>
-            <div className="text-lg">⭐⭐⭐★★</div>
+          <p>Average Comment Rating:</p>
+          <div className="stars">⭐⭐⭐★★</div>
+        </div>
           </div>
         </div>
 
         {/* Account Statistics - Update user table to include counts for each job post, job taken and comment. Display these counts here */}
-        <div className="bg-gray-300 p-4 mt-6 rounded">
-          <p className="text-gray-700">Jobs Posted: <span className="float-right">0</span></p>
-          <p className="text-gray-700">Jobs Undertaken: <span className="float-right">0</span></p>
-          <p className="text-gray-700">Comments: <span className="float-right">0</span></p>
-        </div>
+        <div className="stats">
+			<p>Jobs Posted: <span>0</span></p>
+			<p>Jobs Undertaken: <span>0</span></p>
+			<p>Comments: <span>0</span></p>
+		</div>
       </div>
     </main>
   );
