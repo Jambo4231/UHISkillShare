@@ -173,3 +173,68 @@ button[type="submit"] {
 button[type="submit"]:hover {
   background: #333;
 }
+
+/* Profile Section */
+.profile-container {
+  max-width: 800px;
+  margin: 40px auto;
+  background: white;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+/* Profile Header */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.profile-picture {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+}
+
+/* User Info */
+.user-info {
+  flex: 1;
+}
+
+.user-info p {
+  margin: 5px 0;
+  font-weight: bold;
+}
+
+.user-name {
+  background: #ddd;
+  padding: 8px;
+  border-radius: 5px;
+}
+
+/* Ratings */
+.stars {
+  font-size: 20px;
+  color: #f4c542;
+}
+
+/* Statistics */
+.stats {
+  background: #f0f0f0;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 8px;
+}
+
+.stats p {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+}
