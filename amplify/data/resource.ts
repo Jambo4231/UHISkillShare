@@ -10,7 +10,7 @@ const schema = a.schema({
     .model({
       userid: a.string(), // User ID (Foreign Key equivalent)
       title: a.string().required(), // Job title (VARCHAR 30)
-      subject: a.string().required(), // Course or Subject
+      subject: a.string(), // Course or Subject
       description: a.string().required(), // Job description (VARCHAR 60)
       deadline: a.date(), // Deadline date (AWSDate)
       status: a.integer().default(1), // Status (1 = open, 0 = closed)

@@ -27,13 +27,6 @@ export default function JobsPage() {
       const { data } = await client.models.Job.list();
       console.log("Jobs data received:", data);
 
-      // Check if any jobs are missing the subject field
-      data.forEach((job) => {
-        if (!job.subject) {
-          console.error(`Job with ID ${job.id} is missing a subject!`, job);
-        }
-      });
-
       setJobs(data);
     } catch (err) {
       console.error("Error fetching jobs:", err);
@@ -69,12 +62,14 @@ export default function JobsPage() {
               <div 
                 key={job.id} 
                 className="job-card"
-                onClick={() => router.push(`/job-details/${job.id}`)} // Redirects to Job Details
+                onClick={() => router.push(`/job-details/${job.id}`)} 
                 style={{ cursor: "pointer" }}
               >
                 <div className="job-header">
                   <h2>{job.title}</h2>
-                  <p className="poster">User: {job.userid} • Subject: {job.subject || "N/A"}</p>
+                  <p className="poster">
+                    User: {job.userid} • Subject: {job.subject ? job.subject : "N/A"}
+                  </p>
                 </div>
                 <p className="job-body">{job.description}</p>
                 <div className="job-footer">
@@ -91,3 +86,4 @@ export default function JobsPage() {
     </main>
   );
 }
+
