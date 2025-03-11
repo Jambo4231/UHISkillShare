@@ -22,28 +22,23 @@ export default function JobsPage() {
       console.error("Job model is not available.");
       return;
     }
-  
+
     try {
       const { data } = await client.models.Job.list();
       console.log("Jobs data received:", data);
-  
+
       // Check if any jobs are missing the subject field
       data.forEach((job) => {
         if (!job.subject) {
           console.error(`Job with ID ${job.id} is missing a subject!`, job);
         }
       });
-  
+
       setJobs(data);
     } catch (err) {
       console.error("Error fetching jobs:", err);
     }
   }
- 
-  //Test 1 2 3
-
-  <p style={{ color: "red", fontWeight: "bold" }}>🚀 Auto-build Test 🚀</p>
-
 
   useEffect(() => {
     listJobs();
@@ -57,7 +52,7 @@ export default function JobsPage() {
           <a href="#">My Jobs</a>
           <a href="#">Notifications</a>
           <button onClick={() => router.push("/create-new-job")}>+ New Job</button>
-          </div>
+        </div>
       </nav>
       <div className="layout">
         <aside className="sidebar">
@@ -71,14 +66,21 @@ export default function JobsPage() {
         <section className="content">
           <div className="jobs-list">
             {jobs.map((job) => (
-              <div key={job.id} className="job-card">
+              <div 
+                key={job.id} 
+                className="job-card"
+                onClick={() => router.push(`/job-details/${job.id}`)} // Redirects to Job Details
+                style={{ cursor: "pointer" }}
+              >
                 <div className="job-header">
                   <h2>{job.title}</h2>
-                  <p className="poster">User: {job.userid} • Subject/Course</p>
+                  <p className="poster">User: {job.userid} • Subject: {job.subject || "N/A"}</p>
                 </div>
                 <p className="job-body">{job.description}</p>
                 <div className="job-footer">
-                  <span className={`status ${job.status === 1 ? "open" : "closed"}`}>{job.status === 1 ? "Unresolved" : "Resolved"}</span>
+                  <span className={`status ${job.status === 1 ? "open" : "closed"}`}>
+                    {job.status === 1 ? "Unresolved" : "Resolved"}
+                  </span>
                   <p className="comments">0 Comments</p>
                 </div>
               </div>
