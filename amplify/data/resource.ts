@@ -8,14 +8,36 @@ public API key access (for testing).
 const schema = a.schema({
   Job: a
     .model({
-      userid: a.string(), // User ID (Foreign Key equivalent)
-      title: a.string().required(), // Job title (VARCHAR 30)
+      userid: a.string(), // User ID
+      title: a.string().required(), // Job title
       subject: a.string(), // Course or Subject
-      description: a.string().required(), // Job description (VARCHAR 60)
-      deadline: a.date(), // Deadline date (AWSDate)
+      description: a.string().required(), // Job description
+      deadline: a.date(), // Deadline date
       status: a.integer().default(1), // Status (1 = open, 0 = closed)
     })
     .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+
+    User: a
+    .model({
+      username: a.string().required(), // Unique username
+      usertype: a.integer().default(2), // User type (1 = admin, 2 = regular)
+      firstname: a.string(), // First name
+      surname: a.string(), // Surname 
+      college: a.string(), // College 
+      email: a.string().required(), // Email
+      areaofstudy: a.string(), // Area of Study
+    })
+    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+
+    Comment: a
+    .model({
+      jobid: a.string().required(), // Job ID
+      userid: a.string().required(), // User ID
+      commenttext: a.string().required(), // Comment text
+      commenttime: a.timestamp().default(), // Timestamp of the comment
+    })
+    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+
 });
 
 export type Schema = ClientSchema<typeof schema>;
