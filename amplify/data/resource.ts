@@ -1,10 +1,8 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
-/*== Define Job Table with Subject =======================================
-This schema defines the Job database table with fields matching your MySQL 
-schema while including the "subject" field. The authorization rule allows 
-public API key access (for testing).
-=========================================================================*/
+/*== Define Job, User, and Comment Tables =====================================
+This schema defines the Job, User, and Comment tables for Amplify.
+=============================================================================*/
 const schema = a.schema({
   Job: a
     .model({
@@ -17,27 +15,26 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
 
-    User: a
+  User: a
     .model({
       username: a.string().required(), // Unique username
       usertype: a.integer().default(2), // User type (1 = admin, 2 = regular)
       firstname: a.string(), // First name
-      surname: a.string(), // Surname 
-      college: a.string(), // College 
+      surname: a.string(), // Surname
+      college: a.string(), // College
       email: a.string().required(), // Email
       areaofstudy: a.string(), // Area of Study
     })
     .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
 
-    Comment: a
+  Comment: a
     .model({
       jobid: a.string().required(), // Job ID
       userid: a.string().required(), // User ID
       commenttext: a.string().required(), // Comment text
-      commenttime: a.timestamp().default(), // Timestamp of the comment
+      commenttime: a.timestamp().required(), // Ensure this is provided manually
     })
     .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
-
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -51,6 +48,7 @@ export const data = defineData({
     },
   },
 });
+
 
 
 

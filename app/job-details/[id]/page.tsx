@@ -77,22 +77,26 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
   
     try {
       const userId = "sample-user-id"; // Replace with actual user ID from auth
+      const timestamp = Date.now(); // Generate timestamp manually
+  
       const response = await client.models.Comment.create({
         jobid: id,
         userid: userId,
         commenttext: newComment,
-        commenttime: Date.now(), // Ensure numeric timestamp
+        commenttime: timestamp, // Use manually set timestamp
       });
   
-      // Ensure response.data is valid before updating state
       if (!response?.data) {
         console.error("Comment creation failed.");
-        return; // Exit if there's no valid comment data
+        return;
       }
   
       console.log("Comment posted:", response.data);
   
-      // Ensure only valid comments are stored, avoiding `null` at all costs
+      // Ensure `commenttime` is always set in `response.data`
+      response.data.commenttime = timestamp;
+  
+      // Keep this part unchanged as requested
       setComments((prevComments = []) =>
         [...prevComments, response.data].filter((comment) => comment !== null)
       );
@@ -103,6 +107,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
       setError("Failed to post comment.");
     }
   }
+  
   
   
 
