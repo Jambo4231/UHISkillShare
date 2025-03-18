@@ -13,7 +13,7 @@ Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
 
-export default function JobDetailsPage({ params }: { params: { id: string } }) {
+export default function JobApplicationPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [job, setJob] = useState<any>(null); 
   const [error, setError] = useState<string | null>(null); 
@@ -21,27 +21,27 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
 
   // Fetch Job Details
   useEffect(() => {
-    async function fetchJob() {
-      if (!id) return;
-      try {
-        console.log("Fetching job with ID:", id);
-        const response = await client.models.Job.get({ id });
+  async function fetchJob() {
+    if (!params.id) return; // Ensure we have an ID
+    try {
+      console.log("Fetching job with ID:", params.id);
+      const response = await client.models.Job.get({ id: params.id });
 
-        if (!response?.data) {
-          console.error("Job data is undefined or null:", response);
-          setError("Job not found");
-          return;
-        }
-
-        console.log("Fetched Job Data:", response.data);
-        setJob(response.data);
-      } catch (error) {
-        console.error("Error fetching job details:", error);
-        setError("Failed to fetch job details.");
+      if (!response?.data) {
+        console.error("Job data is undefined or null:", response);
+        setError("Job not found");
+        return;
       }
+
+      console.log("Fetched Job Data:", response.data);
+      setJob(response.data);
+    } catch (error) {
+      console.error("Error fetching job details:", error);
+      setError("Failed to fetch job details.");
     }
-    fetchJob();
-  }, [id]);
+  }
+  fetchJob();
+}, [params.id]);
 
   
   // Handle Job Application Submission
