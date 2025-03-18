@@ -79,7 +79,10 @@ export default function JobsPage() {
 				  {job.status === 1 && (
 					<button 
 					  className="apply-button"
-					  onClick={() => router.push(`/job-application/${job.id}`)}
+					  onClick={(event) => {
+						  event.stopPropagation(); // Prevents navigating to job details
+						  router.push(`/job-application/${job.id}`);
+						}}
 					>
 					  Apply Now
 					</button>
