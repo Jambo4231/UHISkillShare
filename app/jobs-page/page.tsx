@@ -72,19 +72,22 @@ export default function JobsPage() {
                   </p>
                 </div>
                 <p className="job-body">{job.description}</p>
-                <<div className="job-footer">
-				  <span 
-					className={`status ${job.status === 1 ? "open" : "closed"}`}
-					style={{ cursor: job.status === 1 ? "pointer" : "default", textDecoration: job.status === 1 ? "underline" : "none" }}
-					onClick={() => {
-					  if (job.status === 1) {
-						router.push(`/job-application/${job.id}`);
-					  }
-					}}
-				  >
-					{job.status === 1 ? "Unresolved (Click to Apply)" : "Resolved"}
+                <div className="job-footer">
+				  <span className={`status ${job.status === 1 ? "open" : "closed"}`}>
+					{job.status === 1 ? "Unresolved" : "Resolved"}
 				  </span>
+				  {job.status === 1 && (
+					<button 
+					  className="apply-button"
+					  onClick={() => router.push(`/job-application/${job.id}`)}
+					>
+					  Apply Now
+					</button>
+				  )}
 				  <p className="comments">0 Comments</p>
+
+				  
+				  
 				</div>
               </div>
             ))}
