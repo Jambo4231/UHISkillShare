@@ -29,7 +29,7 @@ const schema = a.schema({
 
   Skill: a
     .model({
-      skill: a.string().required, // Unique skill
+      skill: a.string().required(), // Unique skill
     })
     .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
 
@@ -52,7 +52,7 @@ const schema = a.schema({
   Rating: a
     .model({
       jobid: a.string().required(), // Job ID
-      rateduserid: a.string().required, // Rated User ID
+      rateduserid: a.string().required(), // Rated User ID
       ratinguserid: a.string().required(), // Rating User ID
       rating: a.integer().required(), // Rating (1 - 5)
     })
