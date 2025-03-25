@@ -8,6 +8,7 @@ import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import "../../app.css";
+import { Auth } from "aws-amplify";
 
 Amplify.configure(outputs);
 
@@ -46,19 +47,35 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
   
   // Handle Job Application Submission
   async function handleJobSubmit() {
-    if (!job) return;
+  if (!job) return;
+  
+  try {
+    console.log("Fetching logged-in user details...");
     
-    try {
-      console.log("Submitting application for job ID:", job.id);
+    // Fetch current user
+    const user = await Auth.currentAuthenticatedUser();
+    const username = user.username; 
 
-      
+    console.log("Submitting application for job ID:", job.id, "by user:", username);
 
-      setApplicationMessage("");
-    } catch (error) {
-      console.error("Error submitting application:", error);
-      alert("Failed to submit application.");
-    }
+    // Create an entry in the AcceptedJob table
+    const response = await client.models.AcceptedJob.create({
+      jobid: job.id,
+      userid: username, 
+      applytext: applicationMessage,
+    });
+
+    console.log("Application submitted successfully:", response);
+    alert("Your application has been submitted successfully!");
+    
+    
+    setApplicationMessage("");
+
+  } catch (error) {
+    console.error("Error submitting application:", error);
+    alert("Failed to submit application.");
   }
+}
 
   
   
