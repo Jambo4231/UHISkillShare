@@ -74,42 +74,38 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
   // Handle Posting a Comment
   async function handleCommentSubmit() {
     if (!newComment.trim()) return;
-  
+
     try {
       const userId = "sample-user-id"; // Replace with actual user ID from auth
       const timestamp = Date.now(); // Generate timestamp manually
-  
+
       const response = await client.models.Comment.create({
         jobid: id,
         userid: userId,
         commenttext: newComment,
         commenttime: timestamp, // Use manually set timestamp
       });
-  
+
       if (!response?.data) {
         console.error("Comment creation failed.");
         return;
       }
-  
+
       console.log("Comment posted:", response.data);
-  
+
       // Ensure `commenttime` is always set in `response.data`
       response.data.commenttime = timestamp;
-  
-      // Keep this part unchanged as requested
+
       setComments((prevComments = []) =>
         [...prevComments, response.data].filter((comment) => comment !== null)
       );
-  
+
       setNewComment(""); // Clear input field
     } catch (error) {
       console.error("Error posting comment:", error);
       setError("Failed to post comment.");
     }
   }
-  
-  
-  
 
   if (error) {
     return <p className="error">{error}</p>;
@@ -148,6 +144,13 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
           <button onClick={handleCommentSubmit}>Submit Comment</button>
         </div>
 
+        <button
+          className="apply-button"
+          onClick={() => router.push(`/job-application/${id}`)}
+        >
+          Apply for Job / Share UHI Email
+        </button>
+
         {/* Comments List */}
         <div className="comments">
           <h3>Comments</h3>
@@ -155,7 +158,8 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
             <ul>
               {comments.map((comment) => (
                 <li key={comment.id}>
-                  <strong>{comment.userid}</strong>: {comment.commenttext} <br />
+                  <strong>{comment.userid}</strong>: {comment.commenttext}{" "}
+                  <br />
                   <span className="timestamp">
                     {typeof comment.commenttime === "number"
                       ? new Date(comment.commenttime).toLocaleString()

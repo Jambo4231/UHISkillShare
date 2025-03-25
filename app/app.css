@@ -271,3 +271,19 @@ button[type="submit"]:hover {
   border: none;
   cursor: pointer;
 }
+
+.apply-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #0072ce;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.apply-button:hover {
+  background-color: #005fa3;
+}
