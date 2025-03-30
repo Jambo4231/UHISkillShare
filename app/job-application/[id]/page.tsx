@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import { Amplify } from "aws-amplify";
-// @ts-expect-error
-import { Auth } from "@aws-amplify/auth"; 
+import Auth from "aws-amplify/auth";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import "../../app.css";
@@ -53,7 +52,7 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
       console.log("Fetching logged-in user details...");
 
       // Fetch current user
-      const user = await Auth.currentAuthenticatedUser();
+      const user = await Auth.getCurrentUser();
       const username = user.username;
 
       console.log("Submitting application for job ID:", job.id, "by user:", username);
