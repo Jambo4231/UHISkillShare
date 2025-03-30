@@ -7,7 +7,7 @@ import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import { useRouter } from "next/navigation";
 import * as Auth from "aws-amplify/auth";
-import "../../app.css";
+import "../app.css";
 
 Amplify.configure(outputs);
 
