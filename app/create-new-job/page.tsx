@@ -76,7 +76,8 @@ export default function CreateNewJob() {
           </label>
           <label>
             Course or Subject <span className="required">*Required</span>
-            <select
+          </label>
+          <select
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               required
@@ -87,7 +88,6 @@ export default function CreateNewJob() {
                 </option>
               ))}
             </select>
-          </label>
           <label>
             Further Explanation and Description{" "}
             <span className="required">*Required</span>
