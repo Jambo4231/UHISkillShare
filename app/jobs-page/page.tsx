@@ -28,22 +28,28 @@ export default function JobsPage() {
     try {
       const [jobRes, commentRes] = await Promise.all([
         client.models.Job.list(),
-        client.models.Comment.list()
+        client.models.Comment.list(),
       ]);
 
       const jobs = jobRes.data;
       const comments = commentRes.data;
 
+      console.log("Jobs:", jobs);
+      console.log("Comments:", comments);
+
       // Build jobid → count map
-      const commentCounts = comments.reduce((acc, comment) => {
-        acc[comment.jobid] = (acc[comment.jobid] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      const commentCounts = comments.reduce(
+        (acc, comment) => {
+          acc[comment.jobid] = (acc[comment.jobid] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
       // Attach count to each job
       const jobsWithComments = jobs.map((job) => ({
         ...job,
-        commentCount: commentCounts[job.id] || 0
+        commentCount: commentCounts[job.id] || 0,
       }));
 
       setJobs(jobsWithComments);
@@ -63,40 +69,51 @@ export default function JobsPage() {
         <div className="nav-links">
           <a href="#">My Jobs</a>
           <a href="#">Notifications</a>
-          <button onClick={() => router.push("/create-new-job")}>+ New Job</button>
+          <button onClick={() => router.push("/create-new-job")}>
+            + New Job
+          </button>
         </div>
       </nav>
       <div className="layout">
         <aside className="sidebar">
           <h2>Sort by Course/Subject</h2>
           <ul>
-            <li><input type="checkbox" /> Subject 1</li>
-            <li><input type="checkbox" /> Subject 2</li>
-            <li><input type="checkbox" /> Subject 3</li>
+            <li>
+              <input type="checkbox" /> Subject 1
+            </li>
+            <li>
+              <input type="checkbox" /> Subject 2
+            </li>
+            <li>
+              <input type="checkbox" /> Subject 3
+            </li>
           </ul>
         </aside>
         <section className="content">
           <div className="jobs-list">
             {jobs.map((job) => (
-              <div 
-                key={job.id} 
+              <div
+                key={job.id}
                 className="job-card"
-                onClick={() => router.push(`/job-details/${job.id}`)} 
+                onClick={() => router.push(`/job-details/${job.id}`)}
                 style={{ cursor: "pointer" }}
               >
                 <div className="job-header">
                   <h2>{job.title}</h2>
                   <p className="poster">
-                    User: {job.userid} • Subject: {job.subject ? job.subject : "N/A"}
+                    User: {job.userid} • Subject:{" "}
+                    {job.subject ? job.subject : "N/A"}
                   </p>
                 </div>
                 <p className="job-body">{job.description}</p>
                 <div className="job-footer">
-                  <span className={`status ${job.status === 1 ? "open" : "closed"}`}>
+                  <span
+                    className={`status ${job.status === 1 ? "open" : "closed"}`}
+                  >
                     {job.status === 1 ? "Unresolved" : "Resolved"}
                   </span>
                   {job.status === 1 && (
-                    <button 
+                    <button
                       className="apply-button"
                       onClick={(event) => {
                         event.stopPropagation();
@@ -107,7 +124,8 @@ export default function JobsPage() {
                     </button>
                   )}
                   <p className="comments">
-                    {job.commentCount} Comment{job.commentCount !== 1 ? "s" : ""}
+                    {job.commentCount} Comment
+                    {job.commentCount !== 1 ? "s" : ""}
                   </p>
                 </div>
               </div>
