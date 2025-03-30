@@ -65,7 +65,7 @@ export default function JobsPage() {
   return (
     <main className="container">
       <nav className="navbar">
-        <h1>UHI Skill Share</h1>
+        <img src="/logo.png" alt="UHI Skill Share" className="logo" />
         <div className="nav-links">
           <a href="#">My Jobs</a>
           <a href="#">Notifications</a>
