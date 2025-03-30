@@ -15,8 +15,20 @@ const client = generateClient<Schema>();
 
 type JobWithComments = Schema["Job"]["type"] & { commentCount: number };
 
+const subjectOptions = [
+  "Advanced databases",
+  "Designing web-based applications",
+  "Cyber security",
+  "Server technologies",
+  "Network and information security",
+  "Artificial intelligence",
+  "Software construction",
+  "Mobile applications development",
+];
+
 export default function JobsPage() {
   const [jobs, setJobs] = useState<JobWithComments[]>([]);
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const router = useRouter();
 
   async function listJobs() {
@@ -34,19 +46,11 @@ export default function JobsPage() {
       const jobs = jobRes.data;
       const comments = commentRes.data;
 
-      console.log("Jobs:", jobs);
-      console.log("Comments:", comments);
+      const commentCounts = comments.reduce((acc, comment) => {
+        acc[comment.jobid] = (acc[comment.jobid] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
 
-      // Build jobid → count map
-      const commentCounts = comments.reduce(
-        (acc, comment) => {
-          acc[comment.jobid] = (acc[comment.jobid] || 0) + 1;
-          return acc;
-        },
-        {} as Record<string, number>
-      );
-
-      // Attach count to each job
       const jobsWithComments = jobs.map((job) => ({
         ...job,
         commentCount: commentCounts[job.id] || 0,
@@ -62,9 +66,24 @@ export default function JobsPage() {
     listJobs();
   }, []);
 
+  function handleSubjectToggle(subject: string) {
+    setSelectedSubjects((prev) =>
+      prev.includes(subject)
+        ? prev.filter((s) => s !== subject)
+        : [...prev, subject]
+    );
+  }
+
+  const filteredJobs = jobs.filter((job) => {
+    return (
+      selectedSubjects.length === 0 ||
+      selectedSubjects.includes(job.subject || "")
+    );
+  });
+
   return (
     <main className="container">
-       <nav className="navbar">
+      <nav className="navbar">
         <img
           src="/logo.png"
           alt="UHI Skill Share"
@@ -86,20 +105,23 @@ export default function JobsPage() {
         <aside className="sidebar">
           <h2>Sort by Course/Subject</h2>
           <ul>
-            <li>
-              <input type="checkbox" /> Subject 1
-            </li>
-            <li>
-              <input type="checkbox" /> Subject 2
-            </li>
-            <li>
-              <input type="checkbox" /> Subject 3
-            </li>
+            {subjectOptions.map((subject) => (
+              <li key={subject}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={selectedSubjects.includes(subject)}
+                    onChange={() => handleSubjectToggle(subject)}
+                  />
+                  {subject}
+                </label>
+              </li>
+            ))}
           </ul>
         </aside>
         <section className="content">
           <div className="jobs-list">
-            {jobs.map((job) => (
+            {filteredJobs.map((job) => (
               <div
                 key={job.id}
                 className="job-card"
