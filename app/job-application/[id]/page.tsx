@@ -85,11 +85,15 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
   return (
     <main className="container">
       <nav className="navbar">
-        <h1>UHI Skill Share</h1>
+        <img src="/logo.png" alt="UHI Skill Share" className="logo" />
         <div className="nav-links">
           <a href="#">My Jobs</a>
-          <a href="#">Notifications</a>
-          <button onClick={() => router.push("/jobs-page")}>Back</button>
+          <button onClick={() => router.push("/notifications-page")}>
+            Notifications
+          </button>
+          <button onClick={() => router.push("/create-new-job")}>
+            + New Job
+          </button>
         </div>
       </nav>
 

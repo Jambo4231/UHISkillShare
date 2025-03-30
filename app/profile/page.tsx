@@ -18,12 +18,16 @@ export default function CreateNewJob() {
 
   return (
     <main className="container">
-      <nav className="navbar">
-        <h1>UHI Skill Share</h1>
+         <nav className="navbar">
+        <img src="/logo.png" alt="UHI Skill Share" className="logo" />
         <div className="nav-links">
           <a href="#">My Jobs</a>
-          <a href="#">Notifications</a>
-          <button onClick={() => router.push("/jobs-page")}>Back</button>
+          <button onClick={() => router.push("/notifications-page")}>
+           Notifications
+          </button>
+          <button onClick={() => router.push("/create-new-job")}>
+            + New Job
+          </button>
         </div>
       </nav>
       <div className="max-w-4xl mx-auto bg-white shadow-md p-6 mt-6 rounded-lg">

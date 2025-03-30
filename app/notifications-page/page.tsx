@@ -73,12 +73,12 @@ export default function NotificationsPage() {
 
   return (
     <main className="container">
-      <nav className="navbar">
+     <nav className="navbar">
         <img src="/logo.png" alt="UHI Skill Share" className="logo" />
         <div className="nav-links">
           <a href="#">My Jobs</a>
           <button onClick={() => router.push("/notifications-page")}>
-            + Notifications
+            Notifications
           </button>
           <button onClick={() => router.push("/create-new-job")}>
             + New Job
