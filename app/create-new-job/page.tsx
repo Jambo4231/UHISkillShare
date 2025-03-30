@@ -13,9 +13,20 @@ Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
 
+const subjectOptions = [
+  "Advanced databases",
+  "Designing web-based applications",
+  "Cyber security",
+  "Server technologies",
+  "Network and information security",
+  "Artificial intelligence",
+  "Software construction",
+  "Mobile applications development",
+];
+
 export default function CreateNewJob() {
   const [title, setTitle] = useState("");
-  const [subject, setSubject] = useState("");
+  const [subject, setSubject] = useState(subjectOptions[0]);
   const [description, setDescription] = useState("");
   const router = useRouter();
 
@@ -25,15 +36,15 @@ export default function CreateNewJob() {
       title,
       subject,
       description,
-      status: 1, // Default to 'unresolved'
-      userid: "test-user", // Replace with actual user ID
+      status: 1,
+      userid: "test-user", // Replace with actual user ID from auth
     });
-    router.push("/jobs-page"); // Redirect back to jobs page
+    router.push("/jobs-page");
   }
 
   return (
     <main className="container">
-       <nav className="navbar">
+      <nav className="navbar">
         <img
           src="/logo.png"
           alt="UHI Skill Share"
@@ -56,15 +67,35 @@ export default function CreateNewJob() {
         <form onSubmit={handleSubmit}>
           <label>
             Job Title/Question <span className="required">*Required</span>
-            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
           </label>
           <label>
             Course or Subject <span className="required">*Required</span>
-            <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} required />
+            <select
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              required
+            >
+              {subjectOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
-            Further Explanation and Description <span className="required">*Required</span>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} required />
+            Further Explanation and Description{" "}
+            <span className="required">*Required</span>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
           </label>
           <button type="submit">Submit</button>
         </form>
