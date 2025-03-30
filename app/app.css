@@ -287,3 +287,15 @@ button[type="submit"]:hover {
 .apply-button:hover {
   background-color: #005fa3;
 }
+
+.notif-section {
+  margin-bottom: 2rem;
+}
+
+.notif-card {
+  padding: 1rem;
+  border-left: 4px solid #643b9f;
+  background-color: #f4f2ff;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
