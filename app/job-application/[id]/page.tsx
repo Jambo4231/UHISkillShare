@@ -46,33 +46,42 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
 
   // Handle Job Application Submission
   async function handleJobSubmit() {
-    if (!job) return;
-
-    try {
-      console.log("Fetching logged-in user details...");
-
-      // Fetch current user
-      const user = await Auth.getCurrentUser();
-      const username = user.username;
-
-      console.log("Submitting application for job ID:", job.id, "by user:", username);
-
-      // Create an entry in the AcceptedJob table
-      const response = await client.models.AcceptedJob.create({
-        jobid: job.id,
-        userid: username,
-        applytext: applicationMessage,
-      });
-
-      console.log("Application submitted successfully:", response);
-      alert("Your application has been submitted successfully!");
-
-      setApplicationMessage("");
-    } catch (error) {
-      console.error("Error submitting application:", error);
-      alert("Failed to submit application.");
-    }
+  if (!job || !applicationMessage.trim()) {
+    alert("Application message cannot be empty.");
+    return;
   }
+
+  setIsSubmitting(true); // Disable submit to prevent multiple entries
+
+  try {
+    console.log("Fetching logged-in user details...");
+
+    // Fetch the current authenticated user
+    const user = await Auth.currentAuthenticatedUser();
+    const username = user.username;
+
+    console.log("Submitting application for job ID:", job.id, "by user:", username);
+
+    // Create an entry in the Accepted Job table
+    await client.models.AcceptedJob.create({
+      jobid: job.id,
+      userid: username,
+      applytext: applicationMessage.trim(),
+    });
+
+    console.log("Application submitted successfully");
+    alert("Your application has been submitted successfully!");
+
+    setApplicationMessage(""); 
+    router.push("/jobs-page"); // Redirect to the jobs page
+
+  } catch (error) {
+    console.error("Error submitting application:", error);
+    alert("Failed to submit application.");
+  } finally {
+    setIsSubmitting(false);
+  }
+}
 
   if (error) {
     return <p className="error">{error}</p>;
