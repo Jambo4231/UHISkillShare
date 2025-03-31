@@ -46,10 +46,13 @@ export default function JobsPage() {
       const jobs = jobRes.data;
       const comments = commentRes.data;
 
-      const commentCounts = comments.reduce((acc, comment) => {
-        acc[comment.jobid] = (acc[comment.jobid] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      const commentCounts = comments.reduce(
+        (acc, comment) => {
+          acc[comment.jobid] = (acc[comment.jobid] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
       const jobsWithComments = jobs.map((job) => ({
         ...job,
@@ -93,9 +96,7 @@ export default function JobsPage() {
         />
         <div className="nav-links">
           <a href="#">My Jobs</a>
-          <button onClick={() => router.push("/notifications-page")}>
-            Notifications
-          </button>
+          <a href="/notifications-page">Notifications</a>
           <button onClick={() => router.push("/create-new-job")}>
             + New Job
           </button>

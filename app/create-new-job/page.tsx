@@ -54,9 +54,7 @@ export default function CreateNewJob() {
         />
         <div className="nav-links">
           <a href="#">My Jobs</a>
-          <button onClick={() => router.push("/notifications-page")}>
-            Notifications
-          </button>
+          <a href="/notifications-page">Notifications</a>
           <button onClick={() => router.push("/create-new-job")}>
             + New Job
           </button>
