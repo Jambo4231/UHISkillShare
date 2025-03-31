@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
-import { Amplify, Auth } from "aws-amplify";
+import { Amplify } from "aws-amplify";
+import Auth from "aws-amplify/auth";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import "../../app.css";
@@ -18,16 +19,6 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
   const [job, setJob] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [applicationMessage, setApplicationMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false); 
-
-//Debugging Auth 
-  useEffect(() => {
-    console.log("Checking Auth...");
-    Auth.currentAuthenticatedUser()
-      .then(user => console.log("Logged-in user:", user))
-      .catch(error => console.error("Auth error:", error));
-  }, []);
-
 
   // Fetch Job Details
   useEffect(() => {
@@ -55,42 +46,33 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
 
   // Handle Job Application Submission
   async function handleJobSubmit() {
-  if (!job || !applicationMessage.trim()) {
-    alert("Application message cannot be empty.");
-    return;
+    if (!job) return;
+
+    try {
+      console.log("Fetching logged-in user details...");
+
+      // Fetch current user
+      const user = await Auth.getCurrentUser();
+      const username = user.username;
+
+      console.log("Submitting application for job ID:", job.id, "by user:", username);
+
+      // Create an entry in the AcceptedJob table
+      const response = await client.models.AcceptedJob.create({
+        jobid: job.id,
+        userid: username,
+        applytext: applicationMessage,
+      });
+
+      console.log("Application submitted successfully:", response);
+      alert("Your application has been submitted successfully!");
+
+      setApplicationMessage("");
+    } catch (error) {
+      console.error("Error submitting application:", error);
+      alert("Failed to submit application.");
+    }
   }
-
-  setIsSubmitting(true); // Disable submit to prevent multiple entries
-
-  try {
-    console.log("Fetching logged-in user details...");
-
-    // Fetch the current authenticated user
-    const user = await Auth.currentAuthenticatedUser();
-    const username = user.username;
-
-    console.log("Submitting application for job ID:", job.id, "by user:", username);
-
-    // Create an entry in the Accepted Job table
-    await client.models.AcceptedJob.create({
-      jobid: job.id,
-      userid: username,
-      applytext: applicationMessage.trim(),
-    });
-
-    console.log("Application submitted successfully");
-    alert("Your application has been submitted successfully!");
-
-    setApplicationMessage(""); 
-    router.push("/jobs-page"); // Redirect to the jobs page
-
-  } catch (error) {
-    console.error("Error submitting application:", error);
-    alert("Failed to submit application.");
-  } finally {
-    setIsSubmitting(false);
-  }
-}
 
   if (error) {
     return <p className="error">{error}</p>;
@@ -102,22 +84,12 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
 
   return (
     <main className="container">
-       <nav className="navbar">
-        <img
-          src="/logo.png"
-          alt="UHI Skill Share"
-          className="logo"
-          onClick={() => router.push("/jobs-page")}
-          style={{ cursor: "pointer" }}
-        />
+      <nav className="navbar">
+        <h1>UHI Skill Share</h1>
         <div className="nav-links">
           <a href="#">My Jobs</a>
-          <button onClick={() => router.push("/notifications-page")}>
-            Notifications
-          </button>
-          <button onClick={() => router.push("/create-new-job")}>
-            + New Job
-          </button>
+          <a href="#">Notifications</a>
+          <button onClick={() => router.push("/jobs-page")}>Back</button>
         </div>
       </nav>
 
