@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
-import { Amplify } from "aws-amplify";
-import { Auth } from "aws-amplify";
+import { Amplify, Auth } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import "../../app.css";
@@ -20,6 +19,15 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
   const [error, setError] = useState<string | null>(null);
   const [applicationMessage, setApplicationMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false); 
+
+//Debugging Auth 
+  useEffect(() => {
+    console.log("Checking Auth...");
+    Auth.currentAuthenticatedUser()
+      .then(user => console.log("Logged-in user:", user))
+      .catch(error => console.error("Auth error:", error));
+  }, []);
+
 
   // Fetch Job Details
   useEffect(() => {
