@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import { Amplify } from "aws-amplify";
-import Auth from "aws-amplify";
+import { Auth } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import "../../app.css";
@@ -19,6 +19,7 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
   const [job, setJob] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [applicationMessage, setApplicationMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false); 
 
   // Fetch Job Details
   useEffect(() => {
