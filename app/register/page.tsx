@@ -1,13 +1,11 @@
 "use client";
 
-import "../amplify/configureAmplify";
-import { Auth } from "@aws-amplify/auth";
+import { signUp } from "aws-amplify/auth";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import "../app.css";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
-
 
 const client = generateClient<Schema>();
 
@@ -16,34 +14,46 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [screenName, setScreenName] = useState("");
   const [password, setPassword] = useState("");
-  const [studentNumber, setStudentNumber] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    console.log("📤 Attempting to register:", { email, screenName });
 
     try {
       // Step 1: Register user with Amplify Auth
-      await Auth.signUp({
+      const result = await signUp({
         username: email,
-        password: password,
-        attributes: {
-          email: email,
+        password,
+        options: {
+          userAttributes: {
+            email: email,
+            preferred_username: screenName,
+          },
         },
       });
 
+      console.log("✅ signUp success:", result);
+    } catch (error) {
+      console.error("❌ signUp failed:", error);
+      alert("Sign up failed: " + (error as Error).message);
+      return;
+    }
+
+    try {
       // Step 2: Save additional user data into the database
-      await client.models.User.create({
+      const newUser = await client.models.User.create({
         username: screenName,
         email: email,
-        college: "UHI", // Adjust as needed
-        areaofstudy: "", // Optional placeholder
+        college: "UHI",
+        areaofstudy: "",
       });
 
+      console.log("✅ User saved to DB:", newUser);
       alert("Registration successful! Please verify your email.");
       router.push("/login");
     } catch (error) {
-      console.error("Error during registration:", error);
-      alert("Registration failed. See console for details.");
+      console.error("❌ Saving user to DB failed:", error);
+      alert("Saving user data failed: " + (error as Error).message);
     }
   }
 
@@ -76,16 +86,6 @@ export default function RegisterPage() {
               value={screenName}
               required
               onChange={(e) => setScreenName(e.target.value)}
-            />
-          </label>
-
-          <label>
-            Student Number <span className="required">*Required</span>
-            <input
-              type="text"
-              value={studentNumber}
-              required
-              onChange={(e) => setStudentNumber(e.target.value)}
             />
           </label>
 
