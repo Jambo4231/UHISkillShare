@@ -10,12 +10,14 @@ import "@aws-amplify/ui-react/styles.css";
 import { useRouter } from "next/navigation";
 import { signOut } from "aws-amplify/auth";
 
-
 Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
 
-type JobWithComments = Schema["Job"]["type"] & { commentCount: number };
+type JobWithExtras = Schema["Job"]["type"] & {
+  commentCount: number;
+  posterFullName?: string;
+};
 
 const subjectOptions = [
   "Advanced databases",
@@ -29,24 +31,25 @@ const subjectOptions = [
 ];
 
 export default function JobsPage() {
-  const [jobs, setJobs] = useState<JobWithComments[]>([]);
+  const [jobs, setJobs] = useState<JobWithExtras[]>([]);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const router = useRouter();
 
   async function listJobs() {
-    if (!client.models?.Job || !client.models?.Comment) {
-      console.error("Models are not available.");
-      return;
-    }
-
     try {
-      const [jobRes, commentRes] = await Promise.all([
+      const [jobRes, commentRes, userRes] = await Promise.all([
         client.models.Job.list(),
         client.models.Comment.list(),
+        client.models.User.list(),
       ]);
 
       const jobs = jobRes.data;
       const comments = commentRes.data;
+      const users = userRes.data;
+
+      const userMap = new Map(
+        users.map((u) => [u.id, `${u.firstname ?? ""} ${u.surname ?? ""}`.trim()])
+      );
 
       const commentCounts = comments.reduce(
         (acc, comment) => {
@@ -56,21 +59,22 @@ export default function JobsPage() {
         {} as Record<string, number>
       );
 
-      const jobsWithComments = jobs.map((job) => ({
+      const enrichedJobs = jobs.map((job) => ({
         ...job,
         commentCount: commentCounts[job.id] || 0,
+        posterFullName: userMap.get(job.userid ?? "") || "Unknown user",
       }));
 
-      setJobs(jobsWithComments);
+      setJobs(enrichedJobs);
     } catch (err) {
-      console.error("Error fetching jobs or comments:", err);
+      console.error("Error fetching jobs:", err);
     }
   }
 
   async function handleLogout() {
     try {
       await signOut();
-      router.push("/login"); // or wherever you want them to go after logout
+      router.push("/login");
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -95,8 +99,6 @@ export default function JobsPage() {
     );
   });
 
-  
-
   return (
     <main className="container">
       <nav className="navbar">
@@ -116,6 +118,7 @@ export default function JobsPage() {
           <button onClick={handleLogout}>Logout</button>
         </div>
       </nav>
+
       <div className="layout">
         <aside className="sidebar">
           <h2>Sort by Course/Subject</h2>
@@ -134,6 +137,7 @@ export default function JobsPage() {
             ))}
           </ul>
         </aside>
+
         <section className="content">
           <div className="jobs-list">
             {filteredJobs.map((job) => (
@@ -146,8 +150,8 @@ export default function JobsPage() {
                 <div className="job-header">
                   <h2>{job.title}</h2>
                   <p className="poster">
-                    User: {job.userid} • Subject:{" "}
-                    {job.subject ? job.subject : "N/A"}
+                    Posted by: {job.posterFullName || "Unknown user"} • Subject:{" "}
+                    {job.subject || "N/A"}
                   </p>
                 </div>
                 <p className="job-body">{job.description}</p>
