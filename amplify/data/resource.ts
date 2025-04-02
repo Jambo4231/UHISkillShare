@@ -1,112 +1,148 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
-/*== Define Job, User, Skill, AcceptedJob, Notification, Rating, Comment, Rating, Course, Subject, UserSkill, JobSkill and SubjectJob Tables =====================================
-This schema defines the Job, User, Skill, AcceptedJob, Notification, Rating, Comment, Rating, Course, Subject, UserSkill, JobSkill and SubjectJob tables for Amplify.
-=============================================================================*/
 const schema = a.schema({
   Job: a
     .model({
-      userid: a.string(), // User ID
-      title: a.string().required(), // Job title
-      subject: a.string(), // Course or Subject
-      description: a.string().required(), // Job description
-      deadline: a.date(), // Deadline date
-      status: a.integer().default(1), // Status (1 = open, 0 = closed)
+      userid: a.string(),
+      title: a.string().required(),
+      subject: a.string(),
+      description: a.string().required(),
+      deadline: a.date(),
+      status: a.integer().default(1),
     })
-    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.publicApiKey().to(["read"]),
+    ]),
 
   User: a
     .model({
-      username: a.string().required(), // Unique username
-      usertype: a.integer().default(2), // User type (1 = admin, 2 = regular)
-      firstname: a.string(), // First name
-      surname: a.string(), // Surname
-      college: a.string(), // College
-      email: a.string().required(), // Email
-      areaofstudy: a.string(), // Area of Study
+      username: a.string().required(),
+      usertype: a.integer().default(2),
+      firstname: a.string(),
+      surname: a.string(),
+      college: a.string(),
+      email: a.string().required(),
+      areaofstudy: a.string(),
     })
-    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+    .authorization((allow) => [
+      allow.authenticated(), // Full access for signed-in users
+      allow.publicApiKey().to(["read"]), // Read-only for API key users
+    ]),
 
   Skill: a
     .model({
-      skill: a.string().required(), // Unique skill
+      skill: a.string().required(),
     })
-    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.publicApiKey().to(["read"]),
+    ]),
 
   AcceptedJob: a
     .model({
-      jobid: a.string().required(), // Job ID
-      userid: a.string().required(), // User ID
-      applytext: a.string(), // Application Text
+      jobid: a.string().required(),
+      userid: a.string().required(),
+      applytext: a.string(),
     })
-    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.publicApiKey().to(["read"]),
+    ]),
 
   Notification: a
     .model({
-      userid: a.string().required(), // User ID
-      notiftitle: a.string(), // Notification Title
-      notifdescription: a.string(), // Notification Description
+      userid: a.string().required(),
+      notiftitle: a.string(),
+      notifdescription: a.string(),
     })
-    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.publicApiKey().to(["read"]),
+    ]),
 
   Rating: a
     .model({
-      jobid: a.string().required(), // Job ID
-      rateduserid: a.string().required(), // Rated User ID
-      ratinguserid: a.string().required(), // Rating User ID
-      rating: a.integer().required(), // Rating (1 - 5)
+      jobid: a.string().required(),
+      rateduserid: a.string().required(),
+      ratinguserid: a.string().required(),
+      rating: a.integer().required(),
     })
-    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.publicApiKey().to(["read"]),
+    ]),
 
   Comment: a
     .model({
-      jobid: a.string().required(), // Job ID
-      userid: a.string().required(), // User ID
-      commenttext: a.string().required(), // Comment text
-      commenttime: a.timestamp().required(), // Ensure this is provided manually
+      jobid: a.string().required(),
+      userid: a.string().required(),
+      commenttext: a.string().required(),
+      commenttime: a.timestamp().required(),
     })
-    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.publicApiKey().to(["read"]),
+    ]),
 
   Mention: a
     .model({
-      commentid: a.string().required(), // Comment ID
-      userid: a.string().required(), // User ID
+      commentid: a.string().required(),
+      userid: a.string().required(),
     })
-    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.publicApiKey().to(["read"]),
+    ]),
 
   Course: a
     .model({
-      coursename: a.string(), // Course Name
+      coursename: a.string(),
     })
-    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.publicApiKey().to(["read"]),
+    ]),
 
   Subject: a
     .model({
-      courseid: a.string().required(), // Course ID
-      subjectname: a.string().required(), // Subject Name
+      courseid: a.string().required(),
+      subjectname: a.string().required(),
     })
-    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.publicApiKey().to(["read"]),
+    ]),
 
   UserSkill: a
     .model({
-      skillid: a.string().required(), // Skill ID
-      userid: a.string().required(), // User ID
+      skillid: a.string().required(),
+      userid: a.string().required(),
     })
-    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.publicApiKey().to(["read"]),
+    ]),
 
   JobSkill: a
     .model({
-      skillid: a.string().required(), // Skill ID
-      jobid: a.string().required(), // Job ID
+      skillid: a.string().required(),
+      jobid: a.string().required(),
     })
-    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.publicApiKey().to(["read"]),
+    ]),
 
   SubjectJob: a
     .model({
-      subjectid: a.string().required(), // Subject ID
-      jobid: a.string().required(), // Job ID
+      subjectid: a.string().required(),
+      jobid: a.string().required(),
     })
-    .authorization((allow) => [allow.publicApiKey()]), // Adjust as needed
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.publicApiKey().to(["read"]),
+    ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -114,41 +150,9 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: "apiKey",
+    defaultAuthorizationMode: "userPool", // ✅ use Cognito as the default mode
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
     },
   },
 });
-
-
-
-
-/*== STEP 2 ===============================================================
-Go to your frontend source code. From your client-side code, generate a
-Data client to make CRUDL requests to your table. (THIS SNIPPET WILL ONLY
-WORK IN THE FRONTEND CODE FILE.)
-
-Using JavaScript or Next.js React Server Components, Middleware, Server 
-Actions or Pages Router? Review how to generate Data clients for those use
-cases: https://docs.amplify.aws/gen2/build-a-backend/data/connect-to-API/
-=========================================================================*/
-
-/*
-"use client"
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "@/amplify/data/resource";
-
-const client = generateClient<Schema>() // use this Data client for CRUDL requests
-*/
-
-/*== STEP 3 ===============================================================
-Fetch records from the database and use them in your frontend component.
-(THIS SNIPPET WILL ONLY WORK IN THE FRONTEND CODE FILE.)
-=========================================================================*/
-
-/* For example, in a React component, you can use this snippet in your
-  function's RETURN statement */
-// const { data: todos } = await client.models.Todo.list()
-
-// return <ul>{todos.map(todo => <li key={todo.id}>{todo.content}</li>)}</ul>

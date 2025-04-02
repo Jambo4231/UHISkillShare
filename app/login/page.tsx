@@ -4,7 +4,11 @@ import { Amplify } from "aws-amplify";
 import outputs from "../../amplify_outputs.json";
 Amplify.configure(outputs);
 
-import { signIn, getCurrentUser } from "aws-amplify/auth";
+import {
+  signIn,
+  getCurrentUser,
+  fetchAuthSession
+} from "aws-amplify/auth";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
 
@@ -12,7 +16,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import "../app.css";
 
-const client = generateClient<Schema>();
+// ✅ Auth mode set globally for the client
+const client = generateClient<Schema>({
+  authMode: "userPool",
+});
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,39 +29,48 @@ export default function LoginPage() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    setError("");
+
     try {
+      // 🔐 Step 1: Sign in
       await signIn({ username: email, password });
       console.log("✅ Logged in");
 
-      const { userId, signInDetails } = await getCurrentUser();
-      const userAttributes = signInDetails?.loginId || email;
+      // ✅ Step 2: Explicitly wait for auth tokens to be ready
+      const session = await fetchAuthSession({ forceRefresh: true });
+      if (!session.tokens?.accessToken) {
+        throw new Error("Authentication failed: No access token found.");
+      }
+      console.log("🧠 Auth session ready");
 
-      const existing = await client.models.User.list({
-        filter: {
-          email: { eq: email }
-        }
+      // 👤 Step 3: Get user ID
+      const { userId } = await getCurrentUser();
+
+      // 🔍 Step 4: Check for user in DB
+      const result = await client.models.User.list({
+        filter: { email: { eq: email } }
       });
 
-      if (existing.data.length === 0) {
-        console.log("🆕 Creating user record...");
-
+      if (result.data.length === 0) {
+        // 🆕 Step 5: Add user
         await client.models.User.create({
           username: userId,
           email,
-          firstname: "", // Optional: fetch from custom attributes if stored
+          firstname: "",
           surname: "",
           college: "",
           areaofstudy: "",
         });
 
-        console.log("✅ User profile saved to DB");
+        console.log("✅ User created in DB");
       } else {
-        console.log("👤 User already exists in DB");
+        console.log("👤 User already in DB");
       }
 
+      // ✅ Go to jobs page
       router.push("/jobs-page");
     } catch (err: any) {
-      console.error("❌ Login error:", err);
+      console.error("❌ Login failed:", err);
       setError(err.message || "Login failed");
     }
   }

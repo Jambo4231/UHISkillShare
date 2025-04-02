@@ -37,7 +37,7 @@ export default function RegisterPage() {
 
       console.log("✅ signUp success:", result);
       alert("Registration successful! Please verify your email before logging in.");
-      router.push("/login");
+      router.push("/confirm");
     } catch (error) {
       console.error("❌ signUp failed:", error);
       alert("Sign up failed: " + (error as Error).message);
