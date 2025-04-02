@@ -17,7 +17,7 @@ const schema = a.schema({
 
   User: a
     .model({
-      sub: a.string().required(), // ✅ Added for linking to Cognito user
+      sub: a.string().required(), // Added for linking to Cognito user
       username: a.string().required(),
       usertype: a.integer().default(2),
       firstname: a.string(),
