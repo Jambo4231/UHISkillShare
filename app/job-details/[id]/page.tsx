@@ -16,9 +16,9 @@ const client = generateClient<Schema>();
 export default function JobDetailsPage({ params }: { params: { id: string } }) {
   const { id } = params;
   const [job, setJob] = useState<Schema["Job"]["type"] | null>(null);
-  const [posterUsername, setPosterUsername] = useState<string>("Loading...");
+  const [posterName, setPosterName] = useState<string>("Loading...");
   const [comments, setComments] = useState<
-    (Schema["Comment"]["type"] & { username?: string })[]
+    (Schema["Comment"]["type"] & { fullName?: string })[]
   >([]);
   const [newComment, setNewComment] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -43,22 +43,25 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
     fetchJob();
   }, [id]);
 
-  // Fetch Poster Username
+  // Fetch Full Name of Poster
   useEffect(() => {
-    async function fetchPosterUsername() {
+    async function fetchPosterName() {
       if (!job?.userid) return;
       try {
         const result = await client.models.User.get({ id: job.userid });
-        setPosterUsername(result.data?.username ?? "Unknown user");
+        const firstname = result.data?.firstname ?? "";
+        const surname = result.data?.surname ?? "";
+        const fullName = [firstname, surname].filter(Boolean).join(" ").trim();
+        setPosterName(fullName || "Unknown user");
       } catch (error) {
-        console.error("Error fetching poster username:", error);
-        setPosterUsername("Unknown user");
+        console.error("Error fetching poster name:", error);
+        setPosterName("Unknown user");
       }
     }
-    fetchPosterUsername();
+    fetchPosterName();
   }, [job?.userid]);
 
-  // Fetch Comments and commenter usernames
+  // Fetch Comments and commenter names
   useEffect(() => {
     async function fetchComments() {
       if (!id) return;
@@ -72,9 +75,12 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
           rawComments.map(async (comment) => {
             try {
               const userRes = await client.models.User.get({ id: comment.userid });
-              return { ...comment, username: userRes.data?.username ?? "Unknown user" };
+              const firstname = userRes.data?.firstname ?? "";
+              const surname = userRes.data?.surname ?? "";
+              const fullName = [firstname, surname].filter(Boolean).join(" ").trim();
+              return { ...comment, fullName: fullName || "Unknown user" };
             } catch {
-              return { ...comment, username: "Unknown user" };
+              return { ...comment, fullName: "Unknown user" };
             }
           })
         );
@@ -92,8 +98,8 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
   async function handleCommentSubmit() {
     if (!newComment.trim()) return;
     try {
-      const user = await client.models.User.list(); // You'd usually get the user from auth
-      const currentUser = user?.data?.[0]; // TEMP: just grabs first user in DB for testing
+      const userList = await client.models.User.list();
+      const currentUser = userList?.data?.[0]; // TEMP: Replace with actual logged-in user
       const timestamp = Date.now();
 
       const response = await client.models.Comment.create({
@@ -108,7 +114,11 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
       const newPostedComment = {
         ...response.data,
         commenttime: timestamp,
-        username: currentUser?.username ?? "Unknown user",
+        fullName:
+          [currentUser?.firstname, currentUser?.surname]
+            .filter(Boolean)
+            .join(" ")
+            .trim() || "Unknown user",
       };
 
       setComments((prev) => [...prev, newPostedComment]);
@@ -142,7 +152,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
       <div className="job-details">
         <h2>{job.title}</h2>
         <p className="poster">
-          Posted by: <strong>{posterUsername}</strong> • {job.subject || "No Subject"}
+          Posted by: <strong>{posterName}</strong> • {job.subject || "No Subject"}
         </p>
         <p className="job-body">{job.description}</p>
 
@@ -169,7 +179,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
             <ul>
               {comments.map((comment) => (
                 <li key={comment.id}>
-                  <strong>{comment.username}</strong>: {comment.commenttext}
+                  <strong>{comment.fullName}</strong>: {comment.commenttext}
                   <br />
                   <span className="timestamp">
                     {typeof comment.commenttime === "number"
