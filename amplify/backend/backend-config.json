@@ -1,45 +1,30 @@
 {
   "auth": {
-    "teamprojectc92727d8": {
+    "teamproject83d3bea4": {
       "customAuth": false,
       "dependsOn": [],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyCharacters": [],
+          "passwordPolicyMinLength": 8
+        },
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "socialProviders": [],
+        "usernameAttributes": [
+          "EMAIL"
+        ],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
       "providerPlugin": "awscloudformation",
-      "service": "Cognito",
-      "serviceType": "imported"
-    }
-  },
-  "parameters": {
-    "AMPLIFY_auth_teamprojectc92727d8_nativeClientId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "teamprojectc92727d8"
-        }
-      ]
-    },
-    "AMPLIFY_auth_teamprojectc92727d8_userPoolId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "teamprojectc92727d8"
-        }
-      ]
-    },
-    "AMPLIFY_auth_teamprojectc92727d8_userPoolName": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "teamprojectc92727d8"
-        }
-      ]
-    },
-    "AMPLIFY_auth_teamprojectc92727d8_webClientId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "teamprojectc92727d8"
-        }
-      ]
+      "service": "Cognito"
     }
   }
 }
