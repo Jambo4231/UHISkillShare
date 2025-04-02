@@ -313,13 +313,24 @@ button[type="submit"]:hover,
   border-radius: 4px;
 }
 
-/* Jobs Apply Now (refined width) */
-.apply-button.jobs-apply-now {
-  width: auto;
-  min-width: 100px;
-  max-width: 150px;
+/* Jobs Apply Now (refined width override) */
+.job-footer .apply-button.jobs-apply-now {
+  width: auto !important;
+  min-width: 120px;
+  max-width: 160px;
   padding: 8px 16px;
   font-size: 0.9rem;
+  background-color: #0072ce;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+}
+
+.job-footer .apply-button.jobs-apply-now:hover {
+  background-color: #005fa3;
 }
 
 
