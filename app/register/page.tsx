@@ -12,22 +12,26 @@ const client = generateClient<Schema>();
 export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [screenName, setScreenName] = useState("");
+  const [username, setUsername] = useState(""); 
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [surname, setSurname] = useState("");
+  const [college, setCollege] = useState("");
+  const [areaOfStudy, setAreaOfStudy] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log("📤 Attempting to register:", { email, screenName });
+    console.log("📤 Attempting to register:", { email, username });
 
     try {
       // Step 1: Register user with Amplify Auth
       const result = await signUp({
-        username: email,
+        username: email, 
         password,
         options: {
           userAttributes: {
             email: email,
-            preferred_username: screenName,
+            preferred_username: username, 
           },
         },
       });
@@ -40,12 +44,15 @@ export default function RegisterPage() {
     }
 
     try {
-      // Step 2: Save additional user data into the database
+      // Step 2: Save user data into the database
       const newUser = await client.models.User.create({
-        username: screenName,
+        username: username,  
         email: email,
-        college: "UHI",
-        areaofstudy: "",
+        firstname: firstName,
+        surname: surname,
+        college: college || "UHI", // Default to "UHI" if college is not provided
+        areaofstudy: areaOfStudy,
+        usertype: 2, // Default to regular user type
       });
 
       console.log("✅ User saved to DB:", newUser);
@@ -80,12 +87,48 @@ export default function RegisterPage() {
           </label>
 
           <label>
-            Screen Name <span className="required">*Required</span>
+            Username <span className="required">*Required</span>
             <input
               type="text"
-              value={screenName}
+              value={username}  
               required
-              onChange={(e) => setScreenName(e.target.value)}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </label>
+
+          <label>
+            First Name
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </label>
+
+          <label>
+            Surname
+            <input
+              type="text"
+              value={surname}
+              onChange={(e) => setSurname(e.target.value)}
+            />
+          </label>
+
+          <label>
+            College
+            <input
+              type="text"
+              value={college}
+              onChange={(e) => setCollege(e.target.value)}
+            />
+          </label>
+
+          <label>
+            Area of Study
+            <input
+              type="text"
+              value={areaOfStudy}
+              onChange={(e) => setAreaOfStudy(e.target.value)}
             />
           </label>
 

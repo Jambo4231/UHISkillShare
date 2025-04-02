@@ -1,0 +1,94 @@
+# This "input" configures a global authorization rule to enable public access to
+# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
+input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
+
+type Job @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  userid: String!
+  title: String!
+  subject: String
+  description: String!
+  deadline: AWSDateTime
+  status: Int
+}
+
+type User @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  username: String!
+  usertype: Int
+  firstname: String
+  surname: String
+  college: String
+  email: String!
+  areaofstudy: String
+}
+
+type Skill @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  skill: String!
+}
+
+type AcceptedJob @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  jobid: String!
+  userid: String!
+  applytext: String
+}
+
+type Notification @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  userid: String!
+  notiftitle: String
+  notifdescription: String
+}
+
+type Rating @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  jobid: String!
+  rateduserid: String!
+  ratinguserid: String!
+  rating: Int!
+}
+
+type Comment @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  jobid: String!
+  userid: String!
+  commenttext: String!
+  commenttime: AWSDateTime!
+}
+
+type Mention @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  commentid: String!
+  userid: String!
+}
+
+type Course @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  coursename: String
+}
+
+type Subject @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  courseid: String!
+  subjectname: String!
+}
+
+type UserSkill @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  skillid: String!
+  userid: String!
+}
+
+type JobSkill @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  skillid: String!
+  jobid: String!
+}
+
+type SubjectJob @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  subjectid: String!
+  jobid: String!
+}
