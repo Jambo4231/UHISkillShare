@@ -1,5 +1,6 @@
 "use client";
 
+import "../../amplify/configureAmplify";
 import { signUp } from "aws-amplify/auth";
 import { useState } from "react";
 import { useRouter } from "next/navigation";

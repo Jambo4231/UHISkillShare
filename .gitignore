@@ -61,3 +61,10 @@ amplifytools.xcconfig
 .secret-*
 **.sample
 #amplify-do-not-edit-end
+
+
+
+
+# Ignore unnecessary folders
+TeamProject/
+amplify-backup/

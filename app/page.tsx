@@ -1,12 +1,12 @@
 "use client";
 
-import "../app.css";
+import "./app.css";
 import "@aws-amplify/ui-react/styles.css";
 import { Amplify } from "aws-amplify";
-//import outputs from "@/amplify_outputs.json";
+import outputs from "@/amplify_outputs.json";
 import { useRouter } from "next/navigation";
 
-//Amplify.configure(outputs);
+Amplify.configure(outputs);
 
 export default function HomePage() {
   const router = useRouter();
