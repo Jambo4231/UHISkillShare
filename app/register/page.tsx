@@ -47,9 +47,19 @@ export default function RegisterPage() {
   return (
     <main className="container">
       <nav className="navbar">
-        <h1>UHI Skill Share</h1>
+        <img
+          src="/logo.png"
+          alt="UHI Skill Share"
+          className="logo"
+          onClick={() => router.push("/jobs-page")}
+          style={{ cursor: "pointer" }}
+        />
         <div className="nav-links">
-          <a href="/login">Login</a>
+          <a href="#">My Jobs</a>
+          <a href="/notifications-page">Notifications</a>
+          <button onClick={() => router.push("/create-new-job")}>
+            + New Job
+          </button>
         </div>
       </nav>
 
