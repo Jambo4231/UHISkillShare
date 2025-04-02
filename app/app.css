@@ -331,4 +331,8 @@ button[type="submit"]:hover,
   background-color: #005fa3;
 }
 
+.sidebar input[type="checkbox"] {
+  accent-color: white;
+}
+
 
