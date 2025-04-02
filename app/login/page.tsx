@@ -36,25 +36,26 @@ export default function LoginPage() {
       await signIn({ username: email, password });
       console.log("✅ Logged in");
 
-      // ✅ Step 2: Explicitly wait for auth tokens to be ready
+      // ✅ Step 2: Wait for tokens to be available
       const session = await fetchAuthSession({ forceRefresh: true });
       if (!session.tokens?.accessToken) {
         throw new Error("Authentication failed: No access token found.");
       }
       console.log("🧠 Auth session ready");
 
-      // 👤 Step 3: Get user ID
-      const { userId } = await getCurrentUser();
+      // 👤 Step 3: Get Cognito sub
+      const { userId: sub } = await getCurrentUser();
 
-      // 🔍 Step 4: Check for user in DB
+      // 🔍 Step 4: Check for existing user in DB
       const result = await client.models.User.list({
-        filter: { email: { eq: email } }
+        filter: { sub: { eq: sub } },
       });
 
       if (result.data.length === 0) {
-        // 🆕 Step 5: Add user
+        // 🆕 Step 5: Add user with sub
         await client.models.User.create({
-          username: userId,
+          sub,              // ✅ Required by schema
+          username: sub,    // Use sub as a default username
           email,
           firstname: "",
           surname: "",
@@ -67,7 +68,7 @@ export default function LoginPage() {
         console.log("👤 User already in DB");
       }
 
-      // ✅ Go to jobs page
+      // ✅ Step 6: Redirect
       router.push("/jobs-page");
     } catch (err: any) {
       console.error("❌ Login failed:", err);

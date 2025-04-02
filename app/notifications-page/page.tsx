@@ -5,8 +5,8 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
+import { getCurrentUser } from "aws-amplify/auth";
 import { useRouter } from "next/navigation";
-import * as Auth from "aws-amplify/auth";
 import "../app.css";
 
 Amplify.configure(outputs);
@@ -27,11 +27,24 @@ export default function NotificationsPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const user = await Auth.getCurrentUser();
-        const currentUserId = user.username;
+        // 👤 Get Cognito user ID (sub)
+        const { userId: sub } = await getCurrentUser();
+
+        // 🔍 Look up user in User table by sub
+        const userRes = await client.models.User.list({
+          filter: { sub: { eq: sub } },
+        });
+
+        const user = userRes.data?.[0];
+        if (!user) {
+          console.error("No user found with matching sub");
+          return;
+        }
+
+        const currentUserId = user.id;
         setUserId(currentUserId);
 
-        // Fetch all jobs and applications
+        // 📥 Fetch all jobs and accepted applications
         const [jobRes, acceptedRes] = await Promise.all([
           client.models.Job.list(),
           client.models.AcceptedJob.list(),
@@ -40,20 +53,18 @@ export default function NotificationsPage() {
         const allJobs = jobRes.data;
         const allApplications = acceptedRes.data;
 
-        // Applications made BY this user
+        // 💼 Applications BY this user
         const yourApps = allApplications.filter(
           (app) => app.userid === currentUserId
         );
         setYourApplications(yourApps);
 
-        // Jobs created BY this user
+        // 📄 Jobs CREATED BY this user
         const yourJobs = allJobs.filter((job) => job.userid === currentUserId);
 
-        // Applications TO your jobs
+        // 📩 Applications TO your jobs
         const appsToYourJobs = allApplications
-          .filter((app) =>
-            yourJobs.some((job) => job.id === app.jobid)
-          )
+          .filter((app) => yourJobs.some((job) => job.id === app.jobid))
           .map((app) => {
             const job = yourJobs.find((j) => j.id === app.jobid);
             return {

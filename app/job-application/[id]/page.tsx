@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import { Amplify } from "aws-amplify";
-import Auth from "aws-amplify/auth";
+import { getCurrentUser } from "aws-amplify/auth";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import "../../app.css";
@@ -23,18 +23,13 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
   // Fetch Job Details
   useEffect(() => {
     async function fetchJob() {
-      if (!params.id) return; // Ensure we have an ID
+      if (!params.id) return;
       try {
-        console.log("Fetching job with ID:", params.id);
         const response = await client.models.Job.get({ id: params.id });
-
         if (!response?.data) {
-          console.error("Job data is undefined or null:", response);
           setError("Job not found");
           return;
         }
-
-        console.log("Fetched Job Data:", response.data);
         setJob(response.data);
       } catch (error) {
         console.error("Error fetching job details:", error);
@@ -49,24 +44,30 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
     if (!job) return;
 
     try {
-      console.log("Fetching logged-in user details...");
+      // Get Cognito user's sub
+      const { userId: sub } = await getCurrentUser();
 
-      // Fetch current user
-      const user = await Auth.getCurrentUser();
-      const username = user.username;
+      // Look up User model using sub
+      const userRes = await client.models.User.list({
+        filter: { sub: { eq: sub } },
+      });
 
-      console.log("Submitting application for job ID:", job.id, "by user:", username);
+      const user = userRes.data?.[0];
 
-      // Create an entry in the AcceptedJob table
+      if (!user) {
+        alert("Could not find your user profile. Please contact support.");
+        return;
+      }
+
+      // Submit application
       const response = await client.models.AcceptedJob.create({
         jobid: job.id,
-        userid: username,
+        userid: user.id, // ← your internal user ID
         applytext: applicationMessage,
       });
 
       console.log("Application submitted successfully:", response);
       alert("Your application has been submitted successfully!");
-
       setApplicationMessage("");
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -74,13 +75,8 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
     }
   }
 
-  if (error) {
-    return <p className="error">{error}</p>;
-  }
-
-  if (!job) {
-    return <p>Loading job details...</p>;
-  }
+  if (error) return <p className="error">{error}</p>;
+  if (!job) return <p>Loading job details...</p>;
 
   return (
     <main className="container">
@@ -95,9 +91,7 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
         <div className="nav-links">
           <a href="#">My Jobs</a>
           <a href="/notifications-page">Notifications</a>
-          <button onClick={() => router.push("/create-new-job")}>
-            + New Job
-          </button>
+          <button onClick={() => router.push("/create-new-job")}>+ New Job</button>
         </div>
       </nav>
 
@@ -107,13 +101,17 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
           Posted by: {job.userid || "Unknown"} • {job.subject || "No Subject"}
         </p>
         <p className="job-body">
-          Do you wish to apply for this job? If the job poster accepts your application, your UHI email addresses will be shared with each other to allow for further communication.
+          Do you wish to apply for this job? If the job poster accepts your application,
+          your UHI email addresses will be shared with each other to allow for further
+          communication.
         </p>
 
         {/* Application Form */}
         <div className="comment-section">
           <h3>
-            If you have not already communicated in comments, you may choose to provide information or explanation here so that the job poster can see why your application is relevant to their issue.
+            If you have not already communicated in comments, you may choose to provide
+            information or explanation here so that the job poster can see why your
+            application is relevant to their issue.
           </h3>
           <textarea
             placeholder="Write your application"
