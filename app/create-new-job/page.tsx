@@ -29,54 +29,39 @@ export default function CreateNewJob() {
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState(subjectOptions[0]);
   const [description, setDescription] = useState("");
-  const [userId, setUserId] = useState<string | null>(null); // Store user ID
   const router = useRouter();
-
-  // Fetch user ID when the page is loaded
-  useEffect(() => {
-    async function fetchUserId() {
-      try {
-        const { username } = await getCurrentUser(); //  Get current user
-        setUserId(username);
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    }
-    fetchUserId();
-  }, []);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-  
+
     try {
       const { userId: sub } = await getCurrentUser();
-  
-      // Match user by Cognito sub
+
+      // Look up the internal User model based on Cognito sub
       const userResult = await client.models.User.list({
         filter: { sub: { eq: sub } },
       });
-  
+
       const user = userResult.data?.[0];
       if (!user) {
         console.error("User not found in database");
         return;
       }
-  
-      // Create the job using the user's database ID
+
+      // Create the job using the User model's ID
       await client.models.Job.create({
         title,
         subject,
         description,
         status: 1,
-        userid: user.id, // internal user ID
+        userid: user.id,
       });
-  
+
       router.push("/jobs-page");
     } catch (error) {
       console.error("Error creating job:", error);
     }
   }
-  
 
   return (
     <main className="container">
