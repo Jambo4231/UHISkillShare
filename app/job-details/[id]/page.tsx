@@ -16,7 +16,10 @@ const client = generateClient<Schema>();
 export default function JobDetailsPage({ params }: { params: { id: string } }) {
   const { id } = params;
   const [job, setJob] = useState<Schema["Job"]["type"] | null>(null);
-  const [comments, setComments] = useState<Schema["Comment"]["type"][]>([]);
+  const [posterUsername, setPosterUsername] = useState<string>("Loading...");
+  const [comments, setComments] = useState<
+    (Schema["Comment"]["type"] & { username?: string })[]
+  >([]);
   const [newComment, setNewComment] = useState("");
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -26,16 +29,11 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
     async function fetchJob() {
       if (!id) return;
       try {
-        console.log("Fetching job with ID:", id);
         const response = await client.models.Job.get({ id });
-
         if (!response?.data) {
-          console.error("Job data is undefined or null:", response);
           setError("Job not found");
           return;
         }
-
-        console.log("Fetched Job Data:", response.data);
         setJob(response.data);
       } catch (error) {
         console.error("Error fetching job details:", error);
@@ -45,24 +43,43 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
     fetchJob();
   }, [id]);
 
-  // Fetch Comments
+  // Fetch Poster Username
+  useEffect(() => {
+    async function fetchPosterUsername() {
+      if (!job?.userid) return;
+      try {
+        const result = await client.models.User.get({ id: job.userid });
+        setPosterUsername(result.data?.username ?? "Unknown user");
+      } catch (error) {
+        console.error("Error fetching poster username:", error);
+        setPosterUsername("Unknown user");
+      }
+    }
+    fetchPosterUsername();
+  }, [job?.userid]);
+
+  // Fetch Comments and commenter usernames
   useEffect(() => {
     async function fetchComments() {
       if (!id) return;
       try {
-        console.log("Fetching comments for job:", id);
         const response = await client.models.Comment.list({
-          filter: { jobid: { eq: id } }, // Fetch only comments for this job
+          filter: { jobid: { eq: id } },
         });
+        const rawComments = response?.data?.filter(Boolean) ?? [];
 
-        if (!response?.data || !Array.isArray(response.data)) {
-          console.log("No comments found for this job.");
-          setComments([]); // Ensure an empty array instead of null
-          return;
-        }
+        const enrichedComments = await Promise.all(
+          rawComments.map(async (comment) => {
+            try {
+              const userRes = await client.models.User.get({ id: comment.userid });
+              return { ...comment, username: userRes.data?.username ?? "Unknown user" };
+            } catch {
+              return { ...comment, username: "Unknown user" };
+            }
+          })
+        );
 
-        console.log("Fetched Comments:", response.data);
-        setComments(response.data.filter((comment) => comment !== null)); // Filter out null values
+        setComments(enrichedComments);
       } catch (error) {
         console.error("Error fetching comments:", error);
         setError("Failed to load comments.");
@@ -74,46 +91,36 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
   // Handle Posting a Comment
   async function handleCommentSubmit() {
     if (!newComment.trim()) return;
-
     try {
-      const userId = "sample-user-id"; // Replace with actual user ID from auth
-      const timestamp = Date.now(); // Generate timestamp manually
+      const user = await client.models.User.list(); // You'd usually get the user from auth
+      const currentUser = user?.data?.[0]; // TEMP: just grabs first user in DB for testing
+      const timestamp = Date.now();
 
       const response = await client.models.Comment.create({
         jobid: id,
-        userid: userId,
+        userid: currentUser?.id ?? "unknown",
         commenttext: newComment,
-        commenttime: timestamp, // Use manually set timestamp
+        commenttime: timestamp,
       });
 
-      if (!response?.data) {
-        console.error("Comment creation failed.");
-        return;
-      }
+      if (!response?.data) return;
 
-      console.log("Comment posted:", response.data);
+      const newPostedComment = {
+        ...response.data,
+        commenttime: timestamp,
+        username: currentUser?.username ?? "Unknown user",
+      };
 
-      // Ensure `commenttime` is always set in `response.data`
-      response.data.commenttime = timestamp;
-
-      setComments((prevComments = []) =>
-        [...prevComments, response.data].filter((comment) => comment !== null)
-      );
-
-      setNewComment(""); // Clear input field
+      setComments((prev) => [...prev, newPostedComment]);
+      setNewComment("");
     } catch (error) {
       console.error("Error posting comment:", error);
       setError("Failed to post comment.");
     }
   }
 
-  if (error) {
-    return <p className="error">{error}</p>;
-  }
-
-  if (!job) {
-    return <p>Loading job details...</p>;
-  }
+  if (error) return <p className="error">{error}</p>;
+  if (!job) return <p>Loading job details...</p>;
 
   return (
     <main className="container">
@@ -128,19 +135,17 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
         <div className="nav-links">
           <a href="#">My Jobs</a>
           <a href="/notifications-page">Notifications</a>
-          <button onClick={() => router.push("/create-new-job")}>
-            + New Job
-          </button>
+          <button onClick={() => router.push("/create-new-job")}>+ New Job</button>
         </div>
       </nav>
+
       <div className="job-details">
         <h2>{job.title}</h2>
         <p className="poster">
-          Posted by: {job.userid || "Unknown"} • {job.subject || "No Subject"}
+          Posted by: <strong>{posterUsername}</strong> • {job.subject || "No Subject"}
         </p>
         <p className="job-body">{job.description}</p>
 
-        {/* Comment Form */}
         <div className="comment-section">
           <h3>Leave a comment</h3>
           <textarea
@@ -158,14 +163,13 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
           Apply for Job / Share UHI Email
         </button>
 
-        {/* Comments List */}
         <div className="comments">
           <h3>Comments</h3>
           {comments.length > 0 ? (
             <ul>
               {comments.map((comment) => (
                 <li key={comment.id}>
-                  <strong>{comment.userid}</strong>: {comment.commenttext}{" "}
+                  <strong>{comment.username}</strong>: {comment.commenttext}
                   <br />
                   <span className="timestamp">
                     {typeof comment.commenttime === "number"

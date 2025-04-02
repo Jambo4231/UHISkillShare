@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { generateClient } from "aws-amplify/data";
+import { Amplify } from "aws-amplify";
+import { getCurrentUser } from "aws-amplify/auth"; 
 import type { Schema } from "@/amplify/data/resource";
 import "../app.css";
-import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import { useRouter } from "next/navigation";
@@ -28,17 +29,38 @@ export default function CreateNewJob() {
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState(subjectOptions[0]);
   const [description, setDescription] = useState("");
+  const [userId, setUserId] = useState<string | null>(null); // Store user ID
   const router = useRouter();
+
+  // Fetch user ID when the page is loaded
+  useEffect(() => {
+    async function fetchUserId() {
+      try {
+        const { username } = await getCurrentUser(); //  Get current user
+        setUserId(username);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    }
+    fetchUserId();
+  }, []);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+    if (!userId) {
+      console.error("User ID is not available");
+      return;
+    }
+
+    // Create the job using the authenticated user's ID
     await client.models.Job.create({
       title,
       subject,
       description,
-      status: 1,
-      userid: "test-user", // Replace with actual user ID from auth
+      status: 1, // Job status (open)
+      userid: userId, // Use the authenticated user ID
     });
+
     router.push("/jobs-page");
   }
 
@@ -76,16 +98,16 @@ export default function CreateNewJob() {
             Course or Subject <span className="required">*Required</span>
           </label>
           <select
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              required
-            >
-              {subjectOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            required
+          >
+            {subjectOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
           <label>
             Further Explanation and Description{" "}
             <span className="required">*Required</span>
