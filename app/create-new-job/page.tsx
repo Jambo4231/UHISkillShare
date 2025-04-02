@@ -49,11 +49,11 @@ export default function CreateNewJob() {
     event.preventDefault();
   
     try {
-      const { username } = await getCurrentUser();
+      const { userId: sub } = await getCurrentUser();
   
-      // Find the matching User model using the Cognito username
+      // Match user by Cognito sub
       const userResult = await client.models.User.list({
-        filter: { username: { eq: username } },
+        filter: { sub: { eq: sub } },
       });
   
       const user = userResult.data?.[0];
@@ -62,13 +62,13 @@ export default function CreateNewJob() {
         return;
       }
   
-      // Now create the job using the User model's UUID
+      // Create the job using the user's database ID
       await client.models.Job.create({
         title,
         subject,
         description,
         status: 1,
-        userid: user.id, // Use User model's ID here
+        userid: user.id, // internal user ID
       });
   
       router.push("/jobs-page");
@@ -76,6 +76,7 @@ export default function CreateNewJob() {
       console.error("Error creating job:", error);
     }
   }
+  
 
   return (
     <main className="container">
