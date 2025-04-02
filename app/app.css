@@ -149,7 +149,10 @@ label {
   margin-left: 5px;
 }
 
-input,
+/* Text inputs and textareas only */
+input[type="text"],
+input[type="email"],
+input[type="password"],
 textarea {
   width: 100%;
   padding: 10px;
@@ -159,6 +162,18 @@ textarea {
   background-color: white;
   color: black;
 }
+
+/* Checkbox-specific styling */
+.sidebar input[type="checkbox"] {
+  accent-color: white;
+  background-color: white;
+  border: 1px solid #999;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
 
 textarea {
   height: 100px;
@@ -331,14 +346,6 @@ button[type="submit"]:hover,
   background-color: #005fa3;
 }
 
-.sidebar input[type="checkbox"] {
-  accent-color: #ddd; /* light grey or try #fff */
-  background-color: white;
-  border: 1px solid #999;
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}
 
 
 
