@@ -16,7 +16,8 @@ const client = generateClient<Schema>();
 
 export default function JobApplicationPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const [job, setJob] = useState<any>(null);
+  const [job, setJob] = useState<Schema["Job"]["type"] | null>(null);
+  const [posterName, setPosterName] = useState("Loading...");
   const [error, setError] = useState<string | null>(null);
   const [applicationMessage, setApplicationMessage] = useState("");
 
@@ -39,34 +40,47 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
     fetchJob();
   }, [params.id]);
 
+  // Fetch Full Name of Poster
+  useEffect(() => {
+    async function fetchPosterName() {
+      if (!job?.userid) return;
+      try {
+        const result = await client.models.User.get({ id: job.userid });
+        const firstname = result.data?.firstname ?? "";
+        const surname = result.data?.surname ?? "";
+        const fullName = [firstname, surname].filter(Boolean).join(" ").trim();
+        setPosterName(fullName || "Unknown user");
+      } catch (error) {
+        console.error("Error fetching poster name:", error);
+        setPosterName("Unknown user");
+      }
+    }
+    fetchPosterName();
+  }, [job?.userid]);
+
   // Handle Job Application Submission
   async function handleJobSubmit() {
     if (!job) return;
 
     try {
-      // Get Cognito user's sub
       const { userId: sub } = await getCurrentUser();
 
-      // Look up User model using sub
       const userRes = await client.models.User.list({
         filter: { sub: { eq: sub } },
       });
 
       const user = userRes.data?.[0];
-
       if (!user) {
         alert("Could not find your user profile. Please contact support.");
         return;
       }
 
-      // Submit application
-      const response = await client.models.AcceptedJob.create({
+      await client.models.AcceptedJob.create({
         jobid: job.id,
-        userid: user.id, // ← your internal user ID
+        userid: user.id,
         applytext: applicationMessage,
       });
 
-      console.log("Application submitted successfully:", response);
       alert("Your application has been submitted successfully!");
       setApplicationMessage("");
     } catch (error) {
@@ -98,7 +112,7 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
       <div className="job-details">
         <h2>{job.title}</h2>
         <p className="poster">
-          Posted by: {job.userid || "Unknown"} • {job.subject || "No Subject"}
+          Posted by: <strong>{posterName}</strong> • {job.subject || "No Subject"}
         </p>
         <p className="job-body">
           Do you wish to apply for this job? If the job poster accepts your application,
@@ -106,7 +120,6 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
           communication.
         </p>
 
-        {/* Application Form */}
         <div className="comment-section">
           <h3>
             If you have not already communicated in comments, you may choose to provide
