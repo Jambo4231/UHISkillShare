@@ -17,6 +17,7 @@ const schema = a.schema({
 
   User: a
     .model({
+      sub: a.string().required(), // ✅ Added for linking to Cognito user
       username: a.string().required(),
       usertype: a.integer().default(2),
       firstname: a.string(),
@@ -150,7 +151,7 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: "userPool", // ✅ use Cognito as the default mode
+    defaultAuthorizationMode: "userPool",
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
     },

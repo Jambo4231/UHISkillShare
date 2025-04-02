@@ -47,21 +47,34 @@ export default function CreateNewJob() {
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (!userId) {
-      console.error("User ID is not available");
-      return;
+  
+    try {
+      const { username } = await getCurrentUser();
+  
+      // Find the matching User model using the Cognito username
+      const userResult = await client.models.User.list({
+        filter: { username: { eq: username } },
+      });
+  
+      const user = userResult.data?.[0];
+      if (!user) {
+        console.error("User not found in database");
+        return;
+      }
+  
+      // Now create the job using the User model's UUID
+      await client.models.Job.create({
+        title,
+        subject,
+        description,
+        status: 1,
+        userid: user.id, // Use User model's ID here
+      });
+  
+      router.push("/jobs-page");
+    } catch (error) {
+      console.error("Error creating job:", error);
     }
-
-    // Create the job using the authenticated user's ID
-    await client.models.Job.create({
-      title,
-      subject,
-      description,
-      status: 1, // Job status (open)
-      userid: userId, // Use the authenticated user ID
-    });
-
-    router.push("/jobs-page");
   }
 
   return (

@@ -31,11 +31,27 @@ export default function RegisterPage() {
           userAttributes: {
             email: email,
             preferred_username: username,
+            given_name: firstname,
+            family_name: surname,
           },
         },
       });
 
       console.log("✅ signUp success:", result);
+
+      // Store extra details locally so they can be saved in User table after confirmation
+      localStorage.setItem(
+        "pendingUser",
+        JSON.stringify({
+          username,
+          firstname,
+          surname,
+          college,
+          email,
+          areaofstudy,
+        })
+      );
+
       alert("Registration successful! Please verify your email before logging in.");
       router.push("/confirm");
     } catch (error) {

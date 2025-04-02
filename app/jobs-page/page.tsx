@@ -8,6 +8,8 @@ import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import { useRouter } from "next/navigation";
+import { signOut } from "aws-amplify/auth";
+
 
 Amplify.configure(outputs);
 
@@ -65,6 +67,15 @@ export default function JobsPage() {
     }
   }
 
+  async function handleLogout() {
+    try {
+      await signOut();
+      router.push("/login"); // or wherever you want them to go after logout
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  }
+
   useEffect(() => {
     listJobs();
   }, []);
@@ -84,6 +95,8 @@ export default function JobsPage() {
     );
   });
 
+  
+
   return (
     <main className="container">
       <nav className="navbar">
@@ -100,6 +113,7 @@ export default function JobsPage() {
           <button onClick={() => router.push("/create-new-job")}>
             + New Job
           </button>
+          <button onClick={handleLogout}>Logout</button>
         </div>
       </nav>
       <div className="layout">
