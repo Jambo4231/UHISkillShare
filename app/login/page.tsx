@@ -1,9 +1,18 @@
 "use client";
 
-import { signIn } from 'aws-amplify/auth';
+import { Amplify } from "aws-amplify";
+import outputs from "../../amplify_outputs.json";
+Amplify.configure(outputs);
+
+import { signIn, getCurrentUser } from "aws-amplify/auth";
+import { generateClient } from "aws-amplify/data";
+import type { Schema } from "../../amplify/data/resource";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import "../app.css";
+
+const client = generateClient<Schema>();
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,9 +24,37 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       await signIn({ username: email, password });
-      router.push("/jobs-page"); // Redirect user if successful
+      console.log("✅ Logged in");
+
+      const { userId, signInDetails } = await getCurrentUser();
+      const userAttributes = signInDetails?.loginId || email;
+
+      const existing = await client.models.User.list({
+        filter: {
+          email: { eq: email }
+        }
+      });
+
+      if (existing.data.length === 0) {
+        console.log("🆕 Creating user record...");
+
+        await client.models.User.create({
+          username: userId,
+          email,
+          firstname: "", // Optional: fetch from custom attributes if stored
+          surname: "",
+          college: "",
+          areaofstudy: "",
+        });
+
+        console.log("✅ User profile saved to DB");
+      } else {
+        console.log("👤 User already exists in DB");
+      }
+
+      router.push("/jobs-page");
     } catch (err: any) {
-      console.error("Login error:", err);
+      console.error("❌ Login error:", err);
       setError(err.message || "Login failed");
     }
   }
@@ -27,7 +64,7 @@ export default function LoginPage() {
       <nav className="navbar">
         <h1>UHI Skill Share</h1>
         <div className="nav-links">
-        <a href="/register">Register</a>
+          <a href="/register">Register</a>
         </div>
       </nav>
 

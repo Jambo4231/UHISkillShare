@@ -7,6 +7,7 @@ body {
   width: 100vw;
   display: flex;
   flex-direction: column;
+  color: #222; /* Base text colour */
 }
 
 /* NAVBAR */
@@ -120,7 +121,7 @@ body {
   color: #666;
 }
 
-/* FORM STYLING FOR CREATE JOB PAGE */
+/* FORM STYLING */
 .form-container {
   max-width: 600px;
   margin: 40px auto;
@@ -140,6 +141,7 @@ label {
   display: block;
   font-weight: bold;
   margin-top: 15px;
+  color: #222;
 }
 
 .required {
@@ -147,19 +149,24 @@ label {
   margin-left: 5px;
 }
 
-input, textarea {
+input,
+textarea {
   width: 100%;
   padding: 10px;
   margin-top: 5px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  background-color: white;
+  color: black;
 }
 
 textarea {
   height: 100px;
 }
 
-button[type="submit"] {
+button[type="submit"],
+.comment-section button,
+.apply-button {
   display: block;
   width: 100%;
   background: black;
@@ -168,9 +175,12 @@ button[type="submit"] {
   padding: 10px;
   margin-top: 20px;
   cursor: pointer;
+  transition: background 0.2s ease-in-out;
 }
 
-button[type="submit"]:hover {
+button[type="submit"]:hover,
+.comment-section button:hover,
+.apply-button:hover {
   background: #333;
 }
 
@@ -239,6 +249,7 @@ button[type="submit"]:hover {
   font-weight: bold;
 }
 
+/* Job Details */
 .job-details {
   max-width: 800px;
   margin: 40px auto;
@@ -253,6 +264,7 @@ button[type="submit"]:hover {
   padding-bottom: 10px;
 }
 
+/* Comments Section */
 .comment-section textarea {
   width: 100%;
   padding: 10px;
@@ -288,6 +300,7 @@ button[type="submit"]:hover {
   background-color: #005fa3;
 }
 
+/* Notifications */
 .notif-section {
   margin-bottom: 2rem;
 }

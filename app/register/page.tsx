@@ -1,13 +1,13 @@
 "use client";
 
+import { Amplify } from "aws-amplify";
+import outputs from "../../amplify_outputs.json";
+Amplify.configure(outputs);
+
 import { signUp } from "aws-amplify/auth";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import "../app.css";
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "@/amplify/data/resource";
-
-const client = generateClient<Schema>();
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -24,7 +24,6 @@ export default function RegisterPage() {
     console.log("📤 Attempting to register:", { email, username });
 
     try {
-      // Step 1: Register user with Amplify Auth
       const result = await signUp({
         username: email,
         password,
@@ -37,29 +36,11 @@ export default function RegisterPage() {
       });
 
       console.log("✅ signUp success:", result);
+      alert("Registration successful! Please verify your email before logging in.");
+      router.push("/login");
     } catch (error) {
       console.error("❌ signUp failed:", error);
       alert("Sign up failed: " + (error as Error).message);
-      return;
-    }
-
-    try {
-      // Step 2: Save additional user data into your Amplify database
-      const newUser = await client.models.User.create({
-        username,
-        email,
-        firstname,
-        surname,
-        college,
-        areaofstudy,
-      });
-
-      console.log("✅ User saved to DB:", newUser);
-      alert("Registration successful! Please verify your email.");
-      router.push("/login");
-    } catch (error) {
-      console.error("❌ Saving user to DB failed:", error);
-      alert("Saving user data failed: " + (error as Error).message);
     }
   }
 
