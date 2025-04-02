@@ -12,12 +12,12 @@ const client = generateClient<Schema>();
 export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState(""); 
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
+  const [firstname, setFirstname] = useState("");
   const [surname, setSurname] = useState("");
   const [college, setCollege] = useState("");
-  const [areaOfStudy, setAreaOfStudy] = useState("");
+  const [areaofstudy, setAreaOfStudy] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,12 +26,12 @@ export default function RegisterPage() {
     try {
       // Step 1: Register user with Amplify Auth
       const result = await signUp({
-        username: email, 
+        username: email,
         password,
         options: {
           userAttributes: {
             email: email,
-            preferred_username: username, 
+            preferred_username: username,
           },
         },
       });
@@ -44,15 +44,14 @@ export default function RegisterPage() {
     }
 
     try {
-      // Step 2: Save user data into the database
+      // Step 2: Save additional user data into your Amplify database
       const newUser = await client.models.User.create({
-        username: username,  
-        email: email,
-        firstname: firstName,
-        surname: surname,
-        college: college || "UHI", // Default to "UHI" if college is not provided
-        areaofstudy: areaOfStudy,
-        usertype: 2, // Default to regular user type
+        username,
+        email,
+        firstname,
+        surname,
+        college,
+        areaofstudy,
       });
 
       console.log("✅ User saved to DB:", newUser);
@@ -90,44 +89,48 @@ export default function RegisterPage() {
             Username <span className="required">*Required</span>
             <input
               type="text"
-              value={username}  
+              value={username}
               required
               onChange={(e) => setUsername(e.target.value)}
             />
           </label>
 
           <label>
-            First Name
+            First Name <span className="required">*Required</span>
             <input
               type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              value={firstname}
+              required
+              onChange={(e) => setFirstname(e.target.value)}
             />
           </label>
 
           <label>
-            Surname
+            Surname <span className="required">*Required</span>
             <input
               type="text"
               value={surname}
+              required
               onChange={(e) => setSurname(e.target.value)}
             />
           </label>
 
           <label>
-            College
+            College <span className="required">*Required</span>
             <input
               type="text"
               value={college}
+              required
               onChange={(e) => setCollege(e.target.value)}
             />
           </label>
 
           <label>
-            Area of Study
+            Area of Study <span className="required">*Required</span>
             <input
               type="text"
-              value={areaOfStudy}
+              value={areaofstudy}
+              required
               onChange={(e) => setAreaOfStudy(e.target.value)}
             />
           </label>
