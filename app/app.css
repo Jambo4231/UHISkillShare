@@ -312,3 +312,13 @@ button[type="submit"]:hover,
   margin-bottom: 1rem;
   border-radius: 4px;
 }
+
+.jobs-apply-now {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  width: fit-content;
+  min-width: 100px;
+  max-width: 140px;
+  align-self: flex-start; /* optional: prevents it stretching full width */
+}
+
