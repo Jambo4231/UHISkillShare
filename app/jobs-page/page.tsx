@@ -42,12 +42,12 @@ export default function JobsPage() {
         client.models.Comment.list(),
         client.models.User.list(),
       ]);
-  
+
       const jobs = jobRes.data ?? [];
       const comments = commentRes.data ?? [];
       const users = userRes.data ?? [];
-  
-      // Build map of user.id → full name
+
+      // Map user.id → full name
       const userMap = new Map<string, string>();
       users.forEach((user) => {
         const fullName = `${user.firstname ?? ""} ${user.surname ?? ""}`.trim();
@@ -55,7 +55,7 @@ export default function JobsPage() {
           userMap.set(user.id, fullName || "Unnamed user");
         }
       });
-  
+
       // Count comments per job
       const commentCounts = comments.reduce((acc, comment) => {
         if (comment.jobid) {
@@ -63,20 +63,23 @@ export default function JobsPage() {
         }
         return acc;
       }, {} as Record<string, number>);
-  
-      // Enrich each job with comment count + full name of poster
-      const enrichedJobs = jobs.map((job) => {
-        const posterFullName = job.userid
-          ? userMap.get(job.userid) || "Unknown user"
-          : "Unknown user";
-  
-        return {
-          ...job,
-          commentCount: commentCounts[job.id] || 0,
-          posterFullName,
-        };
-      });
-  
+
+      // Add comment count + full name to each job
+      const enrichedJobs = jobs
+        .filter((job): job is NonNullable<typeof job> => Boolean(job?.id))
+        .map((job) => {
+          const posterFullName =
+            job.userid && userMap.has(job.userid)
+              ? userMap.get(job.userid)
+              : "Unknown user";
+
+          return {
+            ...job,
+            commentCount: commentCounts[job.id] || 0,
+            posterFullName,
+          };
+        });
+
       setJobs(enrichedJobs);
     } catch (err) {
       console.error("❌ Error fetching jobs:", err);
