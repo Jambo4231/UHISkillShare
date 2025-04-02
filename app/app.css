@@ -165,8 +165,7 @@ textarea {
 }
 
 button[type="submit"],
-.comment-section button,
-.apply-button {
+.comment-section button {
   display: block;
   width: 100%;
   background: black;
