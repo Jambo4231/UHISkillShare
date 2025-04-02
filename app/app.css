@@ -313,8 +313,7 @@ button[type="submit"]:hover,
   border-radius: 4px;
 }
 
-/* Jobs Apply Now (refined width override) */
-.job-footer .apply-button.jobs-apply-now {
+.jobs-apply-now {
   width: auto !important;
   min-width: 120px;
   max-width: 160px;
@@ -329,7 +328,7 @@ button[type="submit"]:hover,
   text-align: center;
 }
 
-.job-footer .apply-button.jobs-apply-now:hover {
+.jobs-apply-now:hover {
   background-color: #005fa3;
 }
 
