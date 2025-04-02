@@ -44,23 +44,29 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
   }, [id]);
 
   // Fetch Full Name of Poster
-  useEffect(() => {
-    async function fetchPosterName() {
-      if (!job?.userid) return;
-      try {
-        const result = await client.models.User.get({ id: job.userid });
-        const firstname = result.data?.firstname ?? "";
-        const surname = result.data?.surname ?? "";
-        const fullName = [firstname, surname].filter(Boolean).join(" ").trim();
-        setPosterName(fullName || "Unknown user");
-      } catch (error) {
-        console.error("Error fetching poster name:", error);
+useEffect(() => {
+  async function fetchPosterName() {
+    if (!job?.userid) return;
+    try {
+      const result = await client.models.User.get({ id: job.userid });
+      if (!result?.data) {
+        console.warn("No user found with id:", job.userid);
         setPosterName("Unknown user");
+        return;
       }
-    }
-    fetchPosterName();
-  }, [job?.userid]);
 
+      const firstname = result.data.firstname ?? "";
+      const surname = result.data.surname ?? "";
+      const fullName = [firstname, surname].filter(Boolean).join(" ").trim();
+
+      setPosterName(fullName || "Unknown user");
+    } catch (error) {
+      console.error("Error fetching poster name:", error);
+      setPosterName("Unknown user");
+    }
+  }
+  fetchPosterName();
+}, [job?.userid]);
   // Fetch Comments and commenter names
   useEffect(() => {
     async function fetchComments() {
