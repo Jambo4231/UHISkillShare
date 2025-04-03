@@ -1,25 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { generateClient } from "aws-amplify/data";
+import { Auth } from "aws-amplify";
 import type { Schema } from "@/amplify/data/resource";
-import "../app.css";
 import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import { useRouter } from "next/navigation";
-
+import "../app.css";
 
 Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
 
-export default function CreateNewJob() {
-	const router = useRouter();
+export default function Profile() {
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [userData, setUserData] = useState<any>(null);
+
+  // Fetch Logged-in User
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const authUser = await Auth.currentAuthenticatedUser();
+        setUser(authUser);
+
+        // Fetch User Details from Database
+        const userId = authUser.attributes.sub;
+        const userDetails = await client.models.User.get({ id: userId });
+
+        setUserData(userDetails);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  if (!userData) return <p>Loading...</p>;
 
   return (
     <main className="container">
-        <nav className="navbar">
+      <nav className="navbar">
         <img
           src="/logo.png"
           alt="UHI Skill Share"
@@ -35,39 +59,41 @@ export default function CreateNewJob() {
           </button>
         </div>
       </nav>
+
       <div className="max-w-4xl mx-auto bg-white shadow-md p-6 mt-6 rounded-lg">
         <div className="flex gap-6">
           {/* Profile Picture */}
-			<div className="profile-header">
-		{/* Profile Picture */}
-			<div className="profile-picture">
-			  Profile Picture
-        </div>
-          
-          {/* User Info */}
-          <div className="user-info">
-          <p>Screen Name:</p>
-          <div className="user-name">Pull User name from database</div>
+          <div className="profile-header">
+            <div className="profile-picture">
+              <img
+                src={userData?.profilePicture || "/default-avatar.png"}
+                alt="Profile"
+                className="rounded-full w-24 h-24"
+              />
+            </div>
 
-            
-            {/* User Ratings Create table for ratings of jobs done and comments. a rating should range from 1-5 and reference the id of the entry and the users. Calculate the mean of all ratings for user and display them here*/}
-            <p>User Rating:</p>
-          <div className="stars">⭐⭐⭐★★</div>
+            {/* User Info */}
+            <div className="user-info">
+              <p>Screen Name:</p>
+              <div className="user-name">{userData?.username || "N/A"}</div>
 
-          <p>Average Comment Rating:</p>
-          <div className="stars">⭐⭐⭐★★</div>
-        </div>
+              {/* User Ratings */}
+              <p>User Rating:</p>
+              <div className="stars">⭐⭐⭐⭐⭐ ({userData?.averageRating || "0"})</div>
+
+              <p>Average Comment Rating:</p>
+              <div className="stars">⭐⭐⭐★★ ({userData?.commentRating || "0"})</div>
+            </div>
           </div>
         </div>
 
-        {/* Account Statistics - Update user table to include counts for each job post, job taken and comment. Display these counts here */}
+        {/* Account Statistics */}
         <div className="stats">
-			<p>Jobs Posted: <span>0</span></p>
-			<p>Jobs Undertaken: <span>0</span></p>
-			<p>Comments: <span>0</span></p>
-		</div>
+          <p>Jobs Posted: <span>{userData?.jobsPosted || 0}</span></p>
+          <p>Jobs Undertaken: <span>{userData?.jobsTaken || 0}</span></p>
+          <p>Comments: <span>{userData?.comments || 0}</span></p>
+        </div>
       </div>
     </main>
   );
 }
-
