@@ -28,27 +28,33 @@ export default function ConfirmPage() {
 
       // Step 2: Get pending user info from localStorage
       const stored = localStorage.getItem("pendingUser");
-      if (!stored) {
-        throw new Error("User registration details missing");
-      }
+      if (!stored) throw new Error("User registration details missing");
 
+      const parsed = JSON.parse(stored);
       const {
         username,
         firstname,
         surname,
         college,
-        email: storedEmail,
         areaofstudy,
         password,
-      } = JSON.parse(stored);
+        email: storedEmail,
+      } = parsed;
 
-      // Step 3: Sign in user with stored password
+      // Optional sanity check
+      if (!username || !firstname || !surname || !college || !storedEmail || !areaofstudy || !password) {
+        console.warn(" Incomplete user data:", parsed);
+        throw new Error("Some registration fields are missing");
+      }
+
+      // Step 3: Sign in to get session (required before `getCurrentUser`)
       await signIn({ username: email, password });
 
-      // Step 4: Get Cognito user ID
+      // Step 4: Get Cognito sub
       const { userId: sub } = await getCurrentUser();
+      console.log(" Creating user with sub:", sub);
 
-      // Step 5: Create User model entry in DB
+      // Step 5: Create user in database
       await client.models.User.create({
         sub,
         username,
