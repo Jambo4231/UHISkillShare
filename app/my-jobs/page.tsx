@@ -76,7 +76,7 @@ export default function MyJobsPage() {
         </div>
       </nav>
 
-      <section className="my-jobs-container">
+      <section className="content">
         <h2>My Jobs</h2>
 
         {loading && <p>Loading...</p>}
