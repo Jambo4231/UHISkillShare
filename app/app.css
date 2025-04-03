@@ -1,38 +1,147 @@
+/*Variables*/
+:root {
+	--accentcolor: #fc0;/* Hey look, it's orange sherbet!*/
+	--accentcolorhover: #eb0;
+	--lightcolor: #fff;/*For text in dark mode*/
+	--darkcolor: #000;/*For text in light mode*/
+	--backgroundlight: #fff;/*Background Color in light mode*/
+	--backgrounddark: #181825;/*Background color in dark mode*/
+	--offlight: #fafafa;/*Background for elements that stand out from page light mode*/
+	--offdark: #252533;/*Background for elements that stand out from page dark mode*/
+	--applybuttoncolor: #0072ce; /*Up here for safekeeping*/
+	--applybuttonhover: #005fa3;
+}
+/*Removes number of default css added by browsers*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
 /* General Styling */
 body {
   margin: 0;
-  background: linear-gradient(180deg, rgb(117, 81, 194), rgb(255, 255, 255));
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background-color: var(--backgroundlight);
+  color:var(--darkcolor);
+  font-family: "Nunito Sans", sans-serif; 
+  font-weight:400;
   height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;
-  color: #222; /* Base text colour */
+}
+strong {
+	font-weight: 800;
+}
+/*For any unclassified buttons. Which should, hopefully, be none.*/
+button {
+	background-color: var(--accentcolor);
+	border: 0;
+	padding: 10px;
+	margin-top: 20px;
+}
+button:hover {
+	background-color: var(--accentcolorhover);
 }
 
 /* NAVBAR */
+
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
-  background-color: black;
-  color: white;
+  padding: 0px;
+  background-color: #fff;
+  color:var(--darkcolor);
+  /*height:7vh;*/
+  box-shadow:0px 5px 5px #555;
+  border-bottom: 2px solid var(--darkcolor);
+}
+
+.nav-links a {
+	color:var(--darkcolor);
+	text-decoration:none;
+	font-size:1.5em;
+	font-weight:600;
+	border-left: 4px solid var(--darkcolor);
+	padding:5px;
+	margin:5px;
+	padding-left: 2vw;
+	float:left;
+	display:flex;
+	gap:16px;
+}
+.nav-links a:hover {
+	color: var(--offdark);
+	/*background-color: #ccc;
+	box-shadow:10px 10px 10px white inset, -10px -10px 10px white inset;*/
+}
+
+#logo, .logo {
+	height:7vh;
+	border-left:none;
+	margin:0px;
+	padding:0px;
+}
+
+#NavbarProfile {
+	height:4vh;
+	border-left:none;
+	margin:0px;
+	padding:0px;
 }
 
 .nav-links {
   display: flex;
   gap: 16px;
 }
-
+/*
 .nav-links a {
   color: white;
   text-decoration: none;
   font-weight: 600;
 }
-
+*/
 .nav-links button {
-  margin-left: 12px;
+  margin-right:2vw;
+  margin-left:2vw;
+  border: 0;
+  font-size:1.5em;
+  font-weight:600;
+  background-color: var(--accentcolor);
+  margin-top: 1.4%;
+  height: 60%;
+  padding:3px;
+}
+.nav-links button:hover {
+	background-color: var(--accentcolorhover);
+}
+
+#verticalline{
+	text-decoration:none;
+	font-size:1.5em;
+	font-weight:600;
+	border-left: 4px solid var(--darkcolor);
+	padding:0px;
+	margin:5px;
+	padding-left:0px;
+	float:left;
+	display:flex;
+	gap:0px;
 }
 
 /* LAYOUT */
@@ -43,19 +152,25 @@ body {
 
 /* SIDEBAR */
 .sidebar {
-  width: 250px;
-  background: #f4f4f4;
+  width: 20vw;
+  background: var(--offlight);
   padding: 16px;
-  border-right: 2px solid #ddd;
+  border-right: 2px solid var(--darkcolor);
 }
 
 .sidebar h2 {
-  font-size: 18px;
+  font-size: 1.5em;
   margin-bottom: 12px;
+}
+.sidebar label {
+	border-bottom: 0;
+}
+.sidebar ul {
+	list-style-type: none;
 }
 
 /* JOB LISTING */
-.content {
+.jobs-list-container {
   flex-grow: 1;
   padding: 16px;
   display: flex;
@@ -70,11 +185,17 @@ body {
 
 /* JOB CARD */
 .job-card {
-  background: white;
+  background: var(--offlight);
   padding: 16px;
-  border: 1px solid #ddd;
+  font-weight: 400;
+  /*border: 1px solid #ddd;
   border-radius: 8px;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);*/
+}
+.job-card h3{
+	font-weight: 800;
+	font-size: 1.2em;
+	border-bottom: 2px solid var(--darkcolor);
 }
 
 .job-header {
@@ -87,8 +208,9 @@ body {
 }
 
 .job-body {
-  font-size: 14px;
-  color: #333;
+  font-size: 1em;
+  font-weight:400;
+  color: var(--darkcolor);
 }
 
 .job-footer {
@@ -102,14 +224,16 @@ body {
 .status {
   padding: 4px 8px;
   border-radius: 4px;
-  font-weight: bold;
+  font-weight: 500;
 }
 
+/*Marker if job is unresolved*/
 .status.open {
   background-color: #ffcc00;
   color: black;
 }
 
+/*Marker if job is resolved*/
 .status.closed {
   background-color: #4caf50;
   color: white;
@@ -117,31 +241,60 @@ body {
 
 /* COMMENTS */
 .comments {
-  font-size: 12px;
-  color: #666;
+  font-size: 0.8em;
+  color: var(--offdark);
+  border-top: 2px solid var(--darkcolor);
+  margin-top:3vh;
+  padding:5px;
+}
+.comments ul {
+	 list-style-type: none;
+}
+.comments ul li {
+	margin-top: 1vh;
+	background-color: var(--offlight);
+	padding: 5px;
+	border-top: 2px solid var(--darkcolor);
+}
+.comments strong {
+	font-weight: 800;
 }
 
-/* FORM STYLING */
+/* FORM STYLING FOR CREATE JOB PAGE */
 .form-container {
-  max-width: 600px;
+  max-width: 60vw;
   margin: 40px auto;
-  background: white;
-  padding: 20px;
+  background: var(--lightbackground);
+  color: var(--darkcolor);
+  /*padding: 20px;
   border-radius: 8px;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);*/
+}
+.form-container label {
+	font-weight: 800;
+	font-size: 1em;
+}
+.form-container input, .form-container select, .form-container textarea{
+	background-color: var(--offlight);
+	border: 1px solid var(--darkcolor);
+	font-weight: 400;
+	font-size: 1em;
 }
 
 h2 {
-  border-bottom: 2px solid black;
+  border-bottom: 2px solid var(--darkcolor);
   padding-bottom: 10px;
   margin-bottom: 20px;
+  font-size: 1.5em;
+  font-weight: 800;
 }
 
 label {
   display: block;
   font-weight: bold;
-  margin-top: 15px;
-  color: #222;
+  margin-top: 20px;
+  border-bottom: 2px solid var(--darkcolor);
+  margin-bottom: 10px;
 }
 
 .required {
@@ -149,63 +302,41 @@ label {
   margin-left: 5px;
 }
 
-/* Text inputs and textareas only */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-textarea {
+input, textarea {
   width: 100%;
   padding: 10px;
   margin-top: 5px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--backgroundlight);
   border-radius: 4px;
-  background-color: white;
-  color: black;
 }
-
-/* Checkbox-specific styling */
-.sidebar input[type="checkbox"] {
-  accent-color: white;
-  background-color: white;
-  border: 1px solid #999;
-  width: 16px;
-  height: 16px;
-  margin-right: 8px;
-  cursor: pointer;
-}
-
 
 textarea {
   height: 100px;
 }
 
-button[type="submit"],
-.comment-section button {
+button[type="submit"] {
   display: block;
   width: 100%;
-  background: black;
-  color: white;
+  background-color: var(--accentcolor);
+  color: var(--darkcolor);
   border: none;
   padding: 10px;
   margin-top: 20px;
   cursor: pointer;
-  transition: background 0.2s ease-in-out;
 }
 
-button[type="submit"]:hover,
-.comment-section button:hover,
-.apply-button:hover {
-  background: #333;
+button[type="submit"]:hover {
+  background-color: var(--accentcolorhover);
 }
 
 /* Profile Section */
 .profile-container {
-  max-width: 800px;
+  max-width: 60vw;
   margin: 40px auto;
   background: white;
-  padding: 20px;
+  /*padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
+  border-radius: 10px;*/
 }
 
 /* Profile Header */
@@ -224,7 +355,7 @@ button[type="submit"]:hover,
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 14px;
+  font-size: 1em;
 }
 
 /* User Info */
@@ -234,51 +365,59 @@ button[type="submit"]:hover,
 
 .user-info p {
   margin: 5px 0;
-  font-weight: bold;
+  font-weight: 600;
 }
 
-.user-name {
-  background: #ddd;
+.user-name, .stats {
+  background: var(--offlight);
   padding: 8px;
-  border-radius: 5px;
+  color: var(--darkcolor);
 }
 
 /* Ratings */
 .stars {
-  font-size: 20px;
+  font-size: 1.5em;
   color: #f4c542;
 }
 
 /* Statistics */
 .stats {
-  background: #f0f0f0;
-  padding: 15px;
   margin-top: 20px;
-  border-radius: 8px;
 }
 
 .stats p {
   display: flex;
   justify-content: space-between;
-  font-weight: bold;
+  font-weight: 600;
 }
 
-/* Job Details */
 .job-details {
-  max-width: 800px;
+  max-width: 60vw;
   margin: 40px auto;
   padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: var(--backgroundlight);
+  color: var(--darkcolor);
+  /*border-radius: 8px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);*/
 }
 
 .job-details h2 {
-  border-bottom: 2px solid black;
+  border-bottom: 2px solid var(--darkcolor);
   padding-bottom: 10px;
+  font-weight: 800;
+  font-size: 1.5em;
 }
 
-/* Comments Section */
+.poster {
+	color: var(--backgrounddark);
+	font-weight: 200;
+}
+
+/*For making comments. Not existing ones*/
+.comment-section {
+	border-top: 2px solid var(--darkcolor);
+	margin-top: 2vh;
+}
 .comment-section textarea {
   width: 100%;
   padding: 10px;
@@ -286,23 +425,31 @@ button[type="submit"]:hover,
   border-radius: 4px;
   margin-top: 5px;
   height: 80px;
+  background-color: var(--offlight);
 }
 
 .comment-section button {
   display: block;
   margin-top: 10px;
   padding: 10px;
-  background: black;
-  color: white;
+  background: var(--accentcolor);
+  color: black;
   border: none;
   cursor: pointer;
+}
+.comment-section button:hover {
+	background-color: var(--accentcolorhover);
+}
+
+.comment-section h3 {
+	margin-top: 1vh;
 }
 
 .apply-button {
   margin-top: 1rem;
   padding: 0.5rem 1rem;
-  background-color: #0072ce;
-  color: white;
+  background-color: var(--accentcolor);
+  color: var(--darkcolor);
   border: none;
   border-radius: 5px;
   font-weight: bold;
@@ -311,18 +458,18 @@ button[type="submit"]:hover,
 }
 
 .apply-button:hover {
-  background-color: #005fa3;
+  background-color: var(--accentcolorhover);
 }
 
-/* Notifications */
 .notif-section {
   margin-bottom: 2rem;
 }
 
 .notif-card {
   padding: 1rem;
-  border-left: 4px solid #643b9f;
-  background-color: #f4f2ff;
+  border-left: 4px solid var(--accentcolor);
+  background-color: var(--offlight);
+  color: var(--darkcolor);
   margin-bottom: 1rem;
   border-radius: 4px;
 }
@@ -346,12 +493,105 @@ button[type="submit"]:hover,
   background-color: #005fa3;
 }
 
-.sidebar ul {
+/*.sidebar ul {
   list-style: none;
   padding-left: 0;
   margin-left: 0;
+}*/
+
+.content {
+	width: 60vw;
+	margin: 40px auto;
+	padding: 20px;
 }
 
+/*Dark mode*/
+@media (prefers-color-scheme: dark) {
+	body {
+		background-color: var(--backgrounddark);
+		color:var(--lightcolor);
+	}
+	h2 {
+		border-bottom: 2px solid var(--lightcolor);
+	}
+	label {
+		margin-top: 20px;
+		border-bottom: 2px solid var(--lightcolor);
+	}
+	.navbar {
+		background-color: #000;
+		color:var(--lightcolor);
+		border-bottom: 2px solid var(--lightcolor);
+	}
+	.nav-links a {
+		color: var(--lightcolor);
+		border-left: 4px solid var(--lightcolor);
+	}
+	.nav-links a:hover {
+		color: var(--offlight);
+	}
+	#verticalline {
+			border-left: 4px solid var(--lightcolor);
+	}
+	.job-details {
+		background-color: var(--backgrounddark);
+		color: var(--lightcolor);
+	}
+	.job-details h2 {
+		border-bottom: 2px solid var(--lightcolor);
+	}
+	.poster {
+		color: var(--backgroundlight);
+	}
+	.job-body {
+		color: var(--lightcolor);
+	}
+	.comment-section {
+		border-top: 2px solid var(--lightcolor);
+	}
+	.comment-section textarea {
+		background-color: var(--offdark);
+		color: var(--lightcolor);
+	}
+	.comments {
+		border-top: 2px solid var(--lightcolor);
+		color: var(--offwhite);
+	}
+	.comments ul li {
+		background-color: var(--offdark);
+		border-top: 2px solid var(--lightcolor);
+	}
+	.form-container input, .form-container select, .form-container textarea{
+		background-color: var(--offdark);
+		border: 1px solid var(--lightcolor);
+		color: var(--lightcolor);
+	}
+	.form-container {
+		background-color: var(--background-dark);
+		color: var(--lightcolor);
+	}
+	.job-card {
+		background: var(--offdark);
+	}
+	.sidebar {
+		background: var(--offdark);
+		border-right: 2px solid var(--lightcolor);
+	}
+	.job-card h3{
+		border-bottom: 2px solid var(--lightcolor);
+	}
+	.notif-card {
+		background-color: var(--offdark);
+		color: var(--lightcolor);
+	}
+	.user-name, .stats {
+		background: var(--offdark);
+		color: var(--lightcolor);
+	}
+	/*content {
+		background-color: var(--backgroundlight);
+	}*/
+}
 
 
 
