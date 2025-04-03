@@ -29,9 +29,18 @@ export default function ProfilePage() {
           throw new Error("User ID not found in session");
         }
 
-        const userData = await client.models.User.get({ id: userId });
+        const result = await client.models.User.list({
+          filter: { sub: { eq: userId } },
+        });
+
+        const userData = result.data?.[0];
+        if (!userData) {
+          throw new Error("User not found in database");
+        }
+
         setUser(userData);
       } catch (err: any) {
+        console.error("❌ Error loading user:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -80,7 +89,9 @@ export default function ProfilePage() {
 
               <p>Average Comment Rating:</p>
               <div className="stars">
-                {user?.averageCommentRating ? "⭐".repeat(user.averageCommentRating) : "No Ratings"}
+                {user?.averageCommentRating
+                  ? "⭐".repeat(user.averageCommentRating)
+                  : "No Ratings"}
               </div>
             </div>
           </div>
@@ -95,4 +106,3 @@ export default function ProfilePage() {
     </main>
   );
 }
-
