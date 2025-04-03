@@ -126,6 +126,7 @@ button:hover {
   margin-top: 1.4%;
   height: 60%;
   padding:3px;
+  color: var(--darkcolor);
 }
 .nav-links button:hover {
 	background-color: var(--accentcolorhover);
