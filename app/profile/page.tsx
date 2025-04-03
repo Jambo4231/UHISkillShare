@@ -35,12 +35,7 @@ export default function CreateNewJob() {
           </button>
         </div>
       </nav>
-<<<<<<< HEAD
-
-      <div className="content">
-=======
       <div className="max-w-4xl mx-auto bg-white shadow-md p-6 mt-6 rounded-lg">
->>>>>>> parent of 43d7f87 (Reimplemented profile page)
         <div className="flex gap-6">
           {/* Profile Picture */}
 			<div className="profile-header">
@@ -75,4 +70,4 @@ export default function CreateNewJob() {
     </main>
   );
 }
-
+ 
