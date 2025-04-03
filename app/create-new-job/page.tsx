@@ -93,13 +93,13 @@ export default function CreateNewJob() {
         <form onSubmit={handleSubmit}>
           <label>
             Job Title/Question <span className="required">*Required</span>
+          </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
             />
-          </label>
 
           <label>
             Course or Subject <span className="required">*Required</span>
@@ -118,12 +118,12 @@ export default function CreateNewJob() {
 
           <label>
             Further Explanation and Description <span className="required">*Required</span>
+          </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
             />
-          </label>
 
           <button type="submit">Submit</button>
         </form>
