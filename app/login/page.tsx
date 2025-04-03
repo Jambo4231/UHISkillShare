@@ -90,23 +90,23 @@ export default function LoginPage() {
         <form onSubmit={handleLogin}>
           <label>
             UHI Email
+          </label>
             <input
               type="email"
               value={email}
               required
               onChange={(e) => setEmail(e.target.value)}
             />
-          </label>
 
           <label>
             Password
+          </label>
             <input
               type="password"
               value={password}
               required
               onChange={(e) => setPassword(e.target.value)}
             />
-          </label>
 
           <button type="submit">Login</button>
         </form>
