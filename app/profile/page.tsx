@@ -60,7 +60,7 @@ export default function Profile() {
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto bg-white shadow-md p-6 mt-6 rounded-lg">
+      <div className="content">
         <div className="flex gap-6">
           {/* Profile Picture */}
           <div className="profile-header">
