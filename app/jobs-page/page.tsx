@@ -149,7 +149,7 @@ export default function JobsPage() {
           </ul>
         </aside>
 
-        <section className="content">
+        <section className="jobs-list-container">
           <div className="jobs-list">
             {filteredJobs.map((job) => (
               <div
