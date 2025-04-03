@@ -84,73 +84,73 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit}>
           <label>
             UHI Email <span className="required">*Required</span>
+          </label>
             <input
               type="email"
               value={email}
               required
               onChange={(e) => setEmail(e.target.value)}
             />
-          </label>
 
           <label>
             Username <span className="required">*Required</span>
+          </label>
             <input
               type="text"
               value={username}
               required
               onChange={(e) => setUsername(e.target.value)}
             />
-          </label>
 
           <label>
             First Name <span className="required">*Required</span>
+          </label>
             <input
               type="text"
               value={firstname}
               required
               onChange={(e) => setFirstname(e.target.value)}
             />
-          </label>
 
           <label>
             Surname <span className="required">*Required</span>
+          </label>
             <input
               type="text"
               value={surname}
               required
               onChange={(e) => setSurname(e.target.value)}
             />
-          </label>
 
           <label>
             College <span className="required">*Required</span>
+          </label>
             <input
               type="text"
               value={college}
               required
               onChange={(e) => setCollege(e.target.value)}
             />
-          </label>
 
           <label>
             Area of Study <span className="required">*Required</span>
+          </label>
             <input
               type="text"
               value={areaofstudy}
               required
               onChange={(e) => setAreaOfStudy(e.target.value)}
             />
-          </label>
 
           <label>
             Password <span className="required">*Required</span>
+          </label>
             <input
               type="password"
               value={password}
               required
               onChange={(e) => setPassword(e.target.value)}
             />
-          </label>
 
           <button type="submit">Register</button>
         </form>
