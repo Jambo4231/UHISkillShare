@@ -1,25 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import "../app.css";
-import { Amplify } from "aws-amplify";
+import { Amplify, fetchAuthSession } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import { useRouter } from "next/navigation";
 
-
 Amplify.configure(outputs);
-
 const client = generateClient<Schema>();
 
-export default function CreateNewJob() {
-	const router = useRouter();
+export default function ProfilePage() {
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const session = await fetchAuthSession();
+        const userId = session?.tokens?.idToken?.payload["sub"]; // Get logged-in user ID
+
+        if (!userId) {
+          throw new Error("User ID not found in session");
+        }
+
+        const userData = await client.models.User.get({ id: userId });
+        setUser(userData);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchUser();
+  }, []);
+
+  if (loading) return <p>Loading user data...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <main className="container">
-        <nav className="navbar">
+      <nav className="navbar">
         <img
           src="/logo.png"
           alt="UHI Skill Share"
@@ -30,44 +56,41 @@ export default function CreateNewJob() {
         <div className="nav-links">
           <a href="#">My Jobs</a>
           <a href="/notifications-page">Notifications</a>
-          <button onClick={() => router.push("/create-new-job")}>
-            + New Job
-          </button>
+          <button onClick={() => router.push("/create-new-job")}>+ New Job</button>
         </div>
       </nav>
+
       <div className="max-w-4xl mx-auto bg-white shadow-md p-6 mt-6 rounded-lg">
         <div className="flex gap-6">
-          {/* Profile Picture */}
-			<div className="profile-header">
-		{/* Profile Picture */}
-			<div className="profile-picture">
-			  Profile Picture
-        </div>
-          
-          {/* User Info */}
-          <div className="user-info">
-          <p>Screen Name:</p>
-          <div className="user-name">Pull User name from database</div>
+          <div className="profile-header">
+            <div className="profile-picture">
+              <img
+                src={user?.profilePicture || "/DefaultProfile.png"}
+                alt="Profile"
+                className="rounded-full w-24 h-24"
+              />
+            </div>
+            <div className="user-info">
+              <p>Screen Name:</p>
+              <div className="user-name">{user?.username || "N/A"}</div>
 
-            
-            {/* User Ratings Create table for ratings of jobs done and comments. a rating should range from 1-5 and reference the id of the entry and the users. Calculate the mean of all ratings for user and display them here*/}
-            <p>User Rating:</p>
-          <div className="stars">⭐⭐⭐★★</div>
+              <p>User Rating:</p>
+              <div className="stars">{user?.rating ? "⭐".repeat(user.rating) : "No Ratings"}</div>
 
-          <p>Average Comment Rating:</p>
-          <div className="stars">⭐⭐⭐★★</div>
-        </div>
+              <p>Average Comment Rating:</p>
+              <div className="stars">
+                {user?.averageCommentRating ? "⭐".repeat(user.averageCommentRating) : "No Ratings"}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Account Statistics - Update user table to include counts for each job post, job taken and comment. Display these counts here */}
         <div className="stats">
-			<p>Jobs Posted: <span>0</span></p>
-			<p>Jobs Undertaken: <span>0</span></p>
-			<p>Comments: <span>0</span></p>
-		</div>
+          <p>Jobs Posted: <span>{user?.jobsPosted || 0}</span></p>
+          <p>Jobs Undertaken: <span>{user?.jobsUndertaken || 0}</span></p>
+          <p>Comments: <span>{user?.commentsCount || 0}</span></p>
+        </div>
       </div>
     </main>
   );
 }
-
