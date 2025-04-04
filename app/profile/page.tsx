@@ -75,6 +75,7 @@ export default function ProfilePage() {
           style={{ cursor: "pointer" }}
         />
         <div className="nav-links">
+		  <a href="/editUserDetails">Update Profile</a>
           <a href="#">My Jobs</a>
           <a href="/notifications-page">Notifications</a>
           <button onClick={() => router.push("/create-new-job")}>+ New Job</button>
