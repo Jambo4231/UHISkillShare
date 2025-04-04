@@ -86,7 +86,7 @@ export default function ProfilePage() {
           <div className="profile-header">
             <div className="profile-picture">
               <img
-                src={user?.profilePicture || "/default-avatar.png"}
+                src="/DefaultProfile.png"
                 alt="Profile"
                 className="rounded-full w-24 h-24"
               />
