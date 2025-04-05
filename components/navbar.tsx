@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { signOut } from "aws-amplify/auth";
 
-// Force rebuild
 
 
 const Navbar = () => {
