@@ -12,15 +12,18 @@ const Navbar = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        // Small delay to fully initialise session
+        await new Promise((res) => setTimeout(res, 200));
         await getCurrentUser();
         setIsLoggedIn(true);
       } catch {
         setIsLoggedIn(false);
       }
     };
-
+  
     checkAuth();
   }, []);
+  
 
   const handleLogout = async () => {
     try {
