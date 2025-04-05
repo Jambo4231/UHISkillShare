@@ -597,9 +597,13 @@ button[type="submit"]:hover {
 		color: var(--lightcolor);
 	}
 	.logout-button {
-		background-color: #000 !important;
-		color: var(--lightcolor);
-	}
+    background-color: #FFD700;   
+    color: #000000;              
+    border: none;
+    padding: 8px 12px;
+    font-weight: bold;
+    cursor: pointer;
+  }
 	/*content {
 		background-color: var(--backgroundlight);
 	}*/
