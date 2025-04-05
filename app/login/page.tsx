@@ -78,12 +78,6 @@ export default function LoginPage() {
 
   return (
     <main className="container">
-      <nav className="navbar">
-        <h1>UHI Skill Share</h1>
-        <div className="nav-links">
-          <a href="/register">Register</a>
-        </div>
-      </nav>
 
       <div className="form-container">
         <h2>Login</h2>

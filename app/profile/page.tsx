@@ -66,21 +66,7 @@ export default function ProfilePage() {
 
   return (
     <main className="container">
-      <nav className="navbar">
-        <img
-          src="/logo.png"
-          alt="UHI Skill Share"
-          className="logo"
-          onClick={() => router.push("/jobs-page")}
-          style={{ cursor: "pointer" }}
-        />
-        <div className="nav-links">
-		  <a href="/editUserDetails">Update Profile</a>
-          <a href="#">My Jobs</a>
-          <a href="/notifications-page">Notifications</a>
-          <button onClick={() => router.push("/create-new-job")}>+ New Job</button>
-        </div>
-      </nav>
+      
 
       <div className="max-w-4xl mx-auto bg-white shadow-md p-6 mt-6 rounded-lg">
         <div className="flex gap-6">

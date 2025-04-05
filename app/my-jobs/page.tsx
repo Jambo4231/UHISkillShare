@@ -61,21 +61,7 @@ export default function MyJobsPage() {
 
   return (
     <main className="container">
-      <nav className="navbar">
-        <img
-          src="/logo.png"
-          alt="UHI Skill Share"
-          className="logo"
-          onClick={() => router.push("/jobs-page")}
-          style={{ cursor: "pointer" }}
-        />
-        <div className="nav-links">
-          <a href="/my-jobs">My Jobs</a>
-          <a href="/notifications-page">Notifications</a>
-          <button onClick={() => router.push("/create-new-job")}>+ New Job</button>
-        </div>
-      </nav>
-
+      
       <section className="content">
         <h2>My Jobs</h2>
 
