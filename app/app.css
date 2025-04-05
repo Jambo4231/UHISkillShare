@@ -506,6 +506,13 @@ button[type="submit"]:hover {
 	padding: 20px;
 }
 
+.logout-button {
+	background-color: #fff !important;
+	color: var(--darkcolor);
+	font-size:1.5em !important;
+	font-weight:600 !important;
+}
+
 /*Dark mode*/
 @media (prefers-color-scheme: dark) {
 	body {
@@ -587,6 +594,10 @@ button[type="submit"]:hover {
 	}
 	.user-name, .stats {
 		background: var(--offdark);
+		color: var(--lightcolor);
+	}
+	.logout-button {
+		background-color: #000 !important;
 		color: var(--lightcolor);
 	}
 	/*content {
