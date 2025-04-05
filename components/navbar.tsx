@@ -1,11 +1,23 @@
-import { useRouter } from "next/router";
+"use client";
 
-type NavbarProps = {
-  handleLogout: () => void;
-};
+import { useRouter } from "next/navigation";
+import { signOut } from "aws-amplify/auth";
 
-const navbar = ({ handleLogout }: NavbarProps) => {
+// Force rebuild
+
+
+const Navbar = () => {
   const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      router.push("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+  
 
   return (
     <nav className="navbar">
@@ -25,4 +37,4 @@ const navbar = ({ handleLogout }: NavbarProps) => {
   );
 };
 
-export default navbar;
+export default Navbar;
