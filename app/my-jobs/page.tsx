@@ -23,23 +23,14 @@ export default function MyJobsPage() {
       try {
         setLoading(true);
 
-        // Get Cognito user sub
+        // Get Cognito user sub directly
         const { userId: sub } = await getCurrentUser();
 
-        // Lookup matching User record in DB
-        const userRes = await client.models.User.list({
-          filter: { sub: { eq: sub } },
-        });
-
-        const user = userRes.data?.[0];
-        if (!user) throw new Error("User record not found");
-
-        // Fetch jobs created by this user
         const jobRes = await client.models.Job.list({
-          filter: { userid: { eq: user.id } },
+          filter: { userid: { eq: sub } },
         });
 
-        setMyJobs(jobRes.data);
+        setMyJobs(jobRes.data ?? []);
       } catch (err: any) {
         console.error("Failed to load jobs:", err);
         setError(err.message || "Something went wrong");
@@ -61,7 +52,6 @@ export default function MyJobsPage() {
 
   return (
     <main className="container">
-      
       <section className="content">
         <h2>My Jobs</h2>
 
