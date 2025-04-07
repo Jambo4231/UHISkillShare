@@ -49,15 +49,13 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
     async function fetchPosterName() {
       if (!job?.userid) return;
       try {
-        const result = await client.models.User.get({ id: job.userid });
-        if (!result?.data) {
-          console.warn("No user found with id:", job.userid);
-          setPosterName("Unknown user");
-          return;
-        }
+        const result = await client.models.User.list({
+          filter: { sub: { eq: job.userid } },
+        });
 
-        const firstname = result.data.firstname ?? "";
-        const surname = result.data.surname ?? "";
+        const user = result.data?.[0];
+        const firstname = user?.firstname ?? "";
+        const surname = user?.surname ?? "";
         const fullName = [firstname, surname].filter(Boolean).join(" ").trim();
 
         setPosterName(fullName || "Unknown user");
@@ -68,6 +66,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
     }
     fetchPosterName();
   }, [job?.userid]);
+
   // Fetch Comments and commenter names
   useEffect(() => {
     async function fetchComments() {
@@ -81,11 +80,12 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
         const enrichedComments = await Promise.all(
           rawComments.map(async (comment) => {
             try {
-              const userRes = await client.models.User.get({
-                id: comment.userid,
+              const userRes = await client.models.User.list({
+                filter: { sub: { eq: comment.userid } },
               });
-              const firstname = userRes.data?.firstname ?? "";
-              const surname = userRes.data?.surname ?? "";
+              const user = userRes.data?.[0];
+              const firstname = user?.firstname ?? "";
+              const surname = user?.surname ?? "";
               const fullName = [firstname, surname]
                 .filter(Boolean)
                 .join(" ")
@@ -110,11 +110,13 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
   async function handleCommentSubmit() {
     if (!newComment.trim()) return;
     try {
-      const { userId } = await getCurrentUser(); // get the logged-in user's Cognito ID
+      const { userId } = await getCurrentUser(); // Cognito sub
 
-      const userRes = await client.models.User.get({ id: userId });
-      const currentUser = userRes.data;
+      const userRes = await client.models.User.list({
+        filter: { sub: { eq: userId } },
+      });
 
+      const currentUser = userRes.data?.[0];
       const timestamp = Date.now();
 
       const response = await client.models.Comment.create({
