@@ -58,7 +58,7 @@ export default function CreateNewJob() {
         subject,
         description,
         status: 1,
-        userid: user.id, // internal User model ID
+        userid: user.sub,   
       });
 
       console.log("📬 Job created successfully");
