@@ -28,7 +28,8 @@ export default function UpdateProfilePage() {
     const loadUserData = async () => {
       try {
         const session = await fetchAuthSession();
-        const userEmail = session.tokens?.idToken?.payload.email;
+        const userEmail = String(session.tokens?.idToken?.payload.email);
+
 
         if (!userEmail) throw new Error("No email found in session");
 
