@@ -42,44 +42,44 @@ export default function JobsPage() {
         client.models.Comment.list(),
         client.models.User.list(),
       ]);
-  
+
       const jobs = (jobRes.data ?? []).filter((j): j is NonNullable<typeof j> => j !== null);
       const comments = (commentRes.data ?? []).filter((c): c is NonNullable<typeof c> => c !== null);
       const users = (userRes.data ?? []).filter((u): u is NonNullable<typeof u> => u !== null);
-  
+
       const userMap = new Map<string, string>();
       users.forEach((user) => {
         const fullName = `${user.firstname ?? ""} ${user.surname ?? ""}`.trim();
-        if (user.id) {
-          userMap.set(user.id, fullName || "Unnamed user");
+        if (user.sub) {
+          userMap.set(user.sub, fullName || "Unnamed user");
         }
       });
-  
+
       const commentCounts = comments.reduce((acc, comment) => {
         if (comment.jobid) {
           acc[comment.jobid] = (acc[comment.jobid] || 0) + 1;
         }
         return acc;
       }, {} as Record<string, number>);
-  
+
       const enrichedJobs = jobs.map((job) => {
-        const posterFullName = job.userid && userMap.has(job.userid)
-          ? userMap.get(job.userid)
-          : "Unknown user";
-  
+        const posterFullName =
+          job.userid && userMap.has(job.userid)
+            ? userMap.get(job.userid)
+            : "Unknown user";
+
         return {
           ...job,
           commentCount: commentCounts[job.id] || 0,
           posterFullName,
         };
       });
-  
+
       setJobs(enrichedJobs);
     } catch (err) {
       console.error("❌ Error fetching jobs:", err);
     }
   }
-  
 
   async function handleLogout() {
     try {
@@ -111,8 +111,6 @@ export default function JobsPage() {
 
   return (
     <main className="container">
-       
-
       <div className="layout">
         <aside className="sidebar">
           <h2>Sort by Course/Subject</h2>
