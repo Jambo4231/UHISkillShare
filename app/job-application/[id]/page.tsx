@@ -45,9 +45,12 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
     async function fetchPosterName() {
       if (!job?.userid) return;
       try {
-        const result = await client.models.User.get({ id: job.userid });
-        const firstname = result.data?.firstname ?? "";
-        const surname = result.data?.surname ?? "";
+        const result = await client.models.User.list({
+          filter: { sub: { eq: job.userid } },
+        });
+        const user = result.data?.[0];
+        const firstname = user?.firstname ?? "";
+        const surname = user?.surname ?? "";
         const fullName = [firstname, surname].filter(Boolean).join(" ").trim();
         setPosterName(fullName || "Unknown user");
       } catch (error) {
@@ -65,19 +68,9 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
     try {
       const { userId: sub } = await getCurrentUser();
 
-      const userRes = await client.models.User.list({
-        filter: { sub: { eq: sub } },
-      });
-
-      const user = userRes.data?.[0];
-      if (!user) {
-        alert("Could not find your user profile. Please contact support.");
-        return;
-      }
-
       await client.models.AcceptedJob.create({
         jobid: job.id,
-        userid: user.id,
+        userid: sub, 
         applytext: applicationMessage,
       });
 
@@ -94,7 +87,6 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
 
   return (
     <main className="container">
-      
       <div className="job-details">
         <h2>{job.title}</h2>
         <p className="poster">
