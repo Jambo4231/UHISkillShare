@@ -75,7 +75,7 @@ export default function ProfilePage() {
               <img
                 src="/DefaultProfile.png"
                 alt="Profile"
-                className="rounded-full w-24 h-24"
+                className="profile-picture"
               />
             </div>
             <div className="user-info">
@@ -102,6 +102,12 @@ export default function ProfilePage() {
           <p>Jobs Undertaken: <span>{jobsUndertaken}</span></p>
           <p>Comments: <span>{commentsCount}</span></p>
         </div>
+		
+		<div className="update-profile-link">
+		  <button onClick={() => router.push("/updateProfile")}>
+			Update Profile
+		  </button>
+		</div>
       </div>
     </main>
   );
