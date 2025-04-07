@@ -75,7 +75,7 @@ export default function ProfilePage() {
               <img
                 src="/DefaultProfile.png"
                 alt="Profile"
-                className="rounded-full w-24 h-24"
+                className="profile-picture"
               />
             </div>
             <div className="user-info">
