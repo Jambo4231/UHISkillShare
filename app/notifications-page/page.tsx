@@ -27,42 +27,29 @@ export default function NotificationsPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // 👤 Get Cognito user ID (sub)
+        
         const { userId: sub } = await getCurrentUser();
+        setUserId(sub);
 
-        // 🔍 Look up user in User table by sub
-        const userRes = await client.models.User.list({
-          filter: { sub: { eq: sub } },
-        });
-
-        const user = userRes.data?.[0];
-        if (!user) {
-          console.error("No user found with matching sub");
-          return;
-        }
-
-        const currentUserId = user.id;
-        setUserId(currentUserId);
-
-        // 📥 Fetch all jobs and accepted applications
+        
         const [jobRes, acceptedRes] = await Promise.all([
           client.models.Job.list(),
           client.models.AcceptedJob.list(),
         ]);
 
-        const allJobs = jobRes.data;
-        const allApplications = acceptedRes.data;
+        const allJobs = jobRes.data ?? [];
+        const allApplications = acceptedRes.data ?? [];
 
-        // 💼 Applications BY this user
+        
         const yourApps = allApplications.filter(
-          (app) => app.userid === currentUserId
+          (app) => app.userid === sub
         );
         setYourApplications(yourApps);
 
-        // 📄 Jobs CREATED BY this user
-        const yourJobs = allJobs.filter((job) => job.userid === currentUserId);
+        
+        const yourJobs = allJobs.filter((job) => job.userid === sub);
 
-        // 📩 Applications TO your jobs
+       
         const appsToYourJobs = allApplications
           .filter((app) => yourJobs.some((job) => job.id === app.jobid))
           .map((app) => {
@@ -84,8 +71,6 @@ export default function NotificationsPage() {
 
   return (
     <main className="container">
-      
-
       <section className="content">
         <h2>Notifications</h2>
 
