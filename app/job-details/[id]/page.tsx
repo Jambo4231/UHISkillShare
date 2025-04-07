@@ -8,6 +8,7 @@ import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import "../../app.css";
+import { getCurrentUser } from "aws-amplify/auth";
 
 Amplify.configure(outputs);
 
@@ -44,29 +45,29 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
   }, [id]);
 
   // Fetch Full Name of Poster
-useEffect(() => {
-  async function fetchPosterName() {
-    if (!job?.userid) return;
-    try {
-      const result = await client.models.User.get({ id: job.userid });
-      if (!result?.data) {
-        console.warn("No user found with id:", job.userid);
+  useEffect(() => {
+    async function fetchPosterName() {
+      if (!job?.userid) return;
+      try {
+        const result = await client.models.User.get({ id: job.userid });
+        if (!result?.data) {
+          console.warn("No user found with id:", job.userid);
+          setPosterName("Unknown user");
+          return;
+        }
+
+        const firstname = result.data.firstname ?? "";
+        const surname = result.data.surname ?? "";
+        const fullName = [firstname, surname].filter(Boolean).join(" ").trim();
+
+        setPosterName(fullName || "Unknown user");
+      } catch (error) {
+        console.error("Error fetching poster name:", error);
         setPosterName("Unknown user");
-        return;
       }
-
-      const firstname = result.data.firstname ?? "";
-      const surname = result.data.surname ?? "";
-      const fullName = [firstname, surname].filter(Boolean).join(" ").trim();
-
-      setPosterName(fullName || "Unknown user");
-    } catch (error) {
-      console.error("Error fetching poster name:", error);
-      setPosterName("Unknown user");
     }
-  }
-  fetchPosterName();
-}, [job?.userid]);
+    fetchPosterName();
+  }, [job?.userid]);
   // Fetch Comments and commenter names
   useEffect(() => {
     async function fetchComments() {
@@ -80,10 +81,15 @@ useEffect(() => {
         const enrichedComments = await Promise.all(
           rawComments.map(async (comment) => {
             try {
-              const userRes = await client.models.User.get({ id: comment.userid });
+              const userRes = await client.models.User.get({
+                id: comment.userid,
+              });
               const firstname = userRes.data?.firstname ?? "";
               const surname = userRes.data?.surname ?? "";
-              const fullName = [firstname, surname].filter(Boolean).join(" ").trim();
+              const fullName = [firstname, surname]
+                .filter(Boolean)
+                .join(" ")
+                .trim();
               return { ...comment, fullName: fullName || "Unknown user" };
             } catch {
               return { ...comment, fullName: "Unknown user" };
@@ -104,13 +110,16 @@ useEffect(() => {
   async function handleCommentSubmit() {
     if (!newComment.trim()) return;
     try {
-      const userList = await client.models.User.list();
-      const currentUser = userList?.data?.[0]; // TEMP: Replace with actual logged-in user
+      const { userId } = await getCurrentUser(); // get the logged-in user's Cognito ID
+
+      const userRes = await client.models.User.get({ id: userId });
+      const currentUser = userRes.data;
+
       const timestamp = Date.now();
 
       const response = await client.models.Comment.create({
         jobid: id,
-        userid: currentUser?.id ?? "unknown",
+        userid: userId,
         commenttext: newComment,
         commenttime: timestamp,
       });
@@ -140,12 +149,11 @@ useEffect(() => {
 
   return (
     <main className="container">
-      
-
       <div className="job-details">
         <h2>{job.title}</h2>
         <p className="poster">
-          Posted by: <strong>{posterName}</strong> • {job.subject || "No Subject"}
+          Posted by: <strong>{posterName}</strong> •{" "}
+          {job.subject || "No Subject"}
         </p>
         <p className="job-body">{job.description}</p>
 
