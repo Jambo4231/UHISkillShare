@@ -31,7 +31,7 @@ export default function NotificationsPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Get Cognito sub and fetch corresponding internal user
+        // Get Cognito user and find matching User record
         const { userId: sub } = await getCurrentUser();
         const userRes = await client.models.User.list({
           filter: { sub: { eq: sub } },
@@ -40,17 +40,16 @@ export default function NotificationsPage() {
         const currentUser = userRes.data?.[0];
         if (!currentUser) throw new Error("User not found");
 
-        const [jobRes, acceptedRes, userListRes] = await Promise.all([
+        const [jobsRes, acceptedRes, usersRes] = await Promise.all([
           client.models.Job.list(),
           client.models.AcceptedJob.list(),
           client.models.User.list(),
         ]);
 
-        const allJobs = jobRes.data?.filter(Boolean) ?? [];
+        const allJobs = jobsRes.data?.filter(Boolean) ?? [];
         const allApplications = acceptedRes.data?.filter(Boolean) ?? [];
-        const allUsers = userListRes.data?.filter(Boolean) ?? [];
+        const allUsers = usersRes.data?.filter(Boolean) ?? [];
 
-        // Build user map using internal user.id = username
         const userMap = new Map<string, string>();
         allUsers.forEach((user) => {
           if (user.id && user.username) {
@@ -58,14 +57,15 @@ export default function NotificationsPage() {
           }
         });
 
-        // Jobs created by current user
-        const yourJobs = allJobs.filter((job) => job.userid === currentUser.id);
+        // Jobs created by the logged-in user
+        const myJobs = allJobs.filter((job) => job.userid === currentUser.id);
+        const myJobIds = myJobs.map((job) => job.id);
 
-        // Applications TO your jobs
-        const appsToYourJobs: ApplicationToYourJob[] = allApplications
-          .filter((app) => yourJobs.some((job) => job.id === app.jobid))
+        // Applications to your jobs
+        const appsToYourJobs = allApplications
+          .filter((app) => myJobIds.includes(app.jobid))
           .map((app) => {
-            const job = allJobs.find((j) => j.id === app.jobid);
+            const job = myJobs.find((j) => j.id === app.jobid);
             const applicantUsername = userMap.get(app.userid) || "Unknown user";
             return {
               jobTitle: job?.title || "Unknown job",
@@ -76,8 +76,8 @@ export default function NotificationsPage() {
 
         setApplicationsToYourJobs(appsToYourJobs);
 
-        // Applications YOU made
-        const yourApps: YourApplication[] = allApplications
+        // Applications you made
+        const yourApps = allApplications
           .filter((app) => app.userid === currentUser.id)
           .map((app) => {
             const job = allJobs.find((j) => j.id === app.jobid);
@@ -89,8 +89,8 @@ export default function NotificationsPage() {
           });
 
         setYourApplications(yourApps);
-      } catch (error) {
-        console.error("Error loading notifications:", error);
+      } catch (err) {
+        console.error("Error loading notifications:", err);
       }
     }
 
