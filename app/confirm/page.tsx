@@ -68,7 +68,11 @@ export default function ConfirmPage() {
       // Step 6: Clean up and redirect
       localStorage.removeItem("pendingUser");
       setSuccess(true);
-      setTimeout(() => router.push("/login"), 1500);
+      // Signs user out before redirecting to login page
+      setTimeout(async () => {
+        await import("aws-amplify/auth").then(({ signOut }) => signOut());
+        router.push("/login");
+      }, 1500);
     } catch (err: any) {
       console.error("❌ Confirmation error:", err);
       setError(err.message || "Confirmation failed");
