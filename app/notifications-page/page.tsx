@@ -41,13 +41,17 @@ export default function NotificationsPage() {
           client.models.User.list(),
         ]);
 
-        const allJobs = jobRes.data ?? [];
-        const allApplications = acceptedRes.data ?? [];
-        const allUsers = userRes.data ?? [];
+        const allJobs = jobRes.data?.filter(Boolean) ?? [];
+        const allApplications = acceptedRes.data?.filter(Boolean) ?? [];
+        const allUsers = userRes.data?.filter(Boolean) ?? [];
 
         const userMap = new Map<string, string>();
         allUsers.forEach((user) => {
-          if (user.sub && user.username) {
+          if (
+            user &&
+            typeof user.sub === "string" &&
+            typeof user.username === "string"
+          ) {
             userMap.set(user.sub, user.username);
           }
         });
@@ -60,7 +64,7 @@ export default function NotificationsPage() {
           .filter((app) => yourJobs.some((job) => job.id === app.jobid))
           .map((app) => {
             const job = yourJobs.find((j) => j.id === app.jobid);
-            const username = userMap.get(app.userid) || app.userid;
+            const username = userMap.get(app.userid) || app.userid || "Unknown user";
             return {
               jobTitle: job?.title || "Unknown job",
               applicantUsername: username,
