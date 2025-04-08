@@ -31,14 +31,7 @@ export default function NotificationsPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Get Cognito user and find matching User record
         const { userId: sub } = await getCurrentUser();
-        const userRes = await client.models.User.list({
-          filter: { sub: { eq: sub } },
-        });
-
-        const currentUser = userRes.data?.[0];
-        if (!currentUser) throw new Error("User not found");
 
         const [jobsRes, acceptedRes, usersRes] = await Promise.all([
           client.models.Job.list(),
@@ -50,19 +43,20 @@ export default function NotificationsPage() {
         const allApplications = acceptedRes.data?.filter(Boolean) ?? [];
         const allUsers = usersRes.data?.filter(Boolean) ?? [];
 
+        // Map user.sub → username
         const userMap = new Map<string, string>();
         allUsers.forEach((user) => {
-          if (user.id && user.username) {
-            userMap.set(user.id, user.username);
+          if (user.sub && user.username) {
+            userMap.set(user.sub, user.username);
           }
         });
 
-        // Jobs created by the logged-in user
-        const myJobs = allJobs.filter((job) => job.userid === currentUser.id);
+        // Jobs created by current user (matched by Cognito sub)
+        const myJobs = allJobs.filter((job) => job.userid === sub);
         const myJobIds = myJobs.map((job) => job.id);
 
         // Applications to your jobs
-        const appsToYourJobs = allApplications
+        const appsToYourJobs: ApplicationToYourJob[] = allApplications
           .filter((app) => myJobIds.includes(app.jobid))
           .map((app) => {
             const job = myJobs.find((j) => j.id === app.jobid);
@@ -77,8 +71,8 @@ export default function NotificationsPage() {
         setApplicationsToYourJobs(appsToYourJobs);
 
         // Applications you made
-        const yourApps = allApplications
-          .filter((app) => app.userid === currentUser.id)
+        const yourApps: YourApplication[] = allApplications
+          .filter((app) => app.userid === sub)
           .map((app) => {
             const job = allJobs.find((j) => j.id === app.jobid);
             return {
