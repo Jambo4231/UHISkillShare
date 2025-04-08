@@ -33,7 +33,6 @@ export default function NotificationsPage() {
     async function fetchData() {
       try {
         const { userId: sub } = await getCurrentUser();
-        setUserId(sub);
 
         const [jobRes, acceptedRes, userRes] = await Promise.all([
           client.models.Job.list(),
@@ -47,36 +46,36 @@ export default function NotificationsPage() {
 
         const userMap = new Map<string, string>();
         allUsers.forEach((user) => {
-          if (
-            user &&
-            typeof user.sub === "string" &&
-            typeof user.username === "string"
-          ) {
-            userMap.set(user.sub, user.username);
+          if (user.id && user.username) {
+            userMap.set(user.id, user.username);
           }
         });
 
-        // Jobs posted by current user
-        const yourJobs = allJobs.filter((job) => job.userid === sub);
+        // Find the logged-in user's internal user.id
+        const currentUser = allUsers.find((u) => u.sub === sub);
+        if (!currentUser) {
+          console.error("Could not find user matching current Cognito sub.");
+          return;
+        }
+        const currentUserId = currentUser.id;
+        setUserId(currentUserId);
 
-        // Applications to your jobs
+        const yourJobs = allJobs.filter((job) => job.userid === currentUserId);
         const appsToYourJobs: ApplicationToYourJob[] = allApplications
           .filter((app) => yourJobs.some((job) => job.id === app.jobid))
           .map((app) => {
             const job = yourJobs.find((j) => j.id === app.jobid);
-            const username = userMap.get(app.userid) || app.userid || "Unknown user";
+            const username = userMap.get(app.userid) || "Unknown user";
             return {
               jobTitle: job?.title || "Unknown job",
               applicantUsername: username,
               applytext: app.applytext ?? null,
             };
           });
-
         setApplicationsToYourJobs(appsToYourJobs);
 
-        // Applications you made
         const yourApps: YourApplication[] = allApplications
-          .filter((app) => app.userid === sub)
+          .filter((app) => app.userid === currentUserId)
           .map((app) => {
             const job = allJobs.find((j) => j.id === app.jobid);
             return {
@@ -85,7 +84,6 @@ export default function NotificationsPage() {
               applytext: app.applytext ?? null,
             };
           });
-
         setYourApplications(yourApps);
       } catch (error) {
         console.error("Error loading notifications:", error);
