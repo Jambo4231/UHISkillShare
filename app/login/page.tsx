@@ -14,6 +14,7 @@ import type { Schema } from "../../amplify/data/resource";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import "../app.css";
 
 // ✅ Auth mode set globally for the client
@@ -78,34 +79,37 @@ export default function LoginPage() {
 
   return (
     <main className="container">
-
       <div className="form-container">
         <h2>Login</h2>
         <form onSubmit={handleLogin}>
-          <label>
-            UHI Email
-          </label>
-            <input
-              type="email"
-              value={email}
-              required
-              onChange={(e) => setEmail(e.target.value)}
-            />
+          <label>UHI Email</label>
+          <input
+            type="email"
+            value={email}
+            required
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-          <label>
-            Password
-          </label>
-            <input
-              type="password"
-              value={password}
-              required
-              onChange={(e) => setPassword(e.target.value)}
-            />
+          <label>Password</label>
+          <input
+            type="password"
+            value={password}
+            required
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
           <button type="submit">Login</button>
         </form>
 
         {error && <p style={{ color: "red" }}>{error}</p>}
+
+        {/* 👇 Register Link Below Login Button */}
+        <p style={{ marginTop: "1rem" }}>
+          Don&apos;t have an account?{" "}
+          <Link href="/register" style={{ color: "#ffc107", textDecoration: "underline" }}>
+            Register here.
+          </Link>
+        </p>
       </div>
     </main>
   );
