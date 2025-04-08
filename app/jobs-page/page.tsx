@@ -8,7 +8,7 @@ import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import { useRouter } from "next/navigation";
-import { signOut } from "aws-amplify/auth";
+import { signOut, getCurrentUser } from "aws-amplify/auth";
 
 Amplify.configure(outputs);
 
@@ -33,15 +33,19 @@ const subjectOptions = [
 export default function JobsPage() {
   const [jobs, setJobs] = useState<JobWithExtras[]>([]);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [currentUserSub, setCurrentUserSub] = useState<string | null>(null);
   const router = useRouter();
 
   async function listJobs() {
     try {
-      const [jobRes, commentRes, userRes] = await Promise.all([
+      const [{ userId: sub }, jobRes, commentRes, userRes] = await Promise.all([
+        getCurrentUser(),
         client.models.Job.list(),
         client.models.Comment.list(),
         client.models.User.list(),
       ]);
+
+      setCurrentUserSub(sub);
 
       const jobs = (jobRes.data ?? []).filter((j): j is NonNullable<typeof j> => j !== null);
       const comments = (commentRes.data ?? []).filter((c): c is NonNullable<typeof c> => c !== null);
@@ -153,7 +157,7 @@ export default function JobsPage() {
                   >
                     {job.status === 1 ? "Unresolved" : "Resolved"}
                   </span>
-                  {job.status === 1 && (
+                  {job.status === 1 && job.userid !== currentUserSub && (
                     <button
                       className="apply-button"
                       onClick={(event) => {
