@@ -58,18 +58,18 @@ export default function NotificationsPage() {
           }
         });
 
-        // Jobs created by current user (based on internal UUID)
+        // Jobs created by current user
         const yourJobs = allJobs.filter((job) => job.userid === currentUser.id);
 
         // Applications TO your jobs
         const appsToYourJobs: ApplicationToYourJob[] = allApplications
           .filter((app) => yourJobs.some((job) => job.id === app.jobid))
           .map((app) => {
-            const job = yourJobs.find((j) => j.id === app.jobid);
-            const username = userMap.get(app.userid) || "Unknown user";
+            const job = allJobs.find((j) => j.id === app.jobid);
+            const applicantUsername = userMap.get(app.userid) || "Unknown user";
             return {
               jobTitle: job?.title || "Unknown job",
-              applicantUsername: username,
+              applicantUsername,
               applytext: app.applytext ?? null,
             };
           });
