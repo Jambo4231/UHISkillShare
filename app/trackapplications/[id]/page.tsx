@@ -10,14 +10,19 @@ import "@aws-amplify/ui-react/styles.css";
 import "../../app.css";
 
 Amplify.configure(outputs);
-
 const client = generateClient<Schema>();
+
+type ApplicationWithExtras = {
+  id: string;
+  userId: string;
+  fullName: string;
+  applicationText: string;
+  status: string;
+};
 
 export default function TrackApplicationsPage({ params }: { params: { id: string } }) {
   const jobId = params.id;
-  const [applications, setApplications] = useState<
-    { applicantId: string; applicationText: string }[]
-  >([]);
+  const [applications, setApplications] = useState<ApplicationWithExtras[]>([]);
   const [jobTitle, setJobTitle] = useState("Loading...");
   const [error, setError] = useState("");
 
@@ -36,21 +41,31 @@ export default function TrackApplicationsPage({ params }: { params: { id: string
 
         setJobTitle(job.title ?? "Unknown Job");
 
-        // Check if the job belongs to the current user
         if (job.userid !== sub) {
           setError("You do not have permission to view applications for this job.");
           return;
         }
 
-        const acceptedRes = await client.models.AcceptedJob.list({
-          filter: { jobid: { eq: jobId } },
-        });
+        const [acceptedRes, usersRes] = await Promise.all([
+          client.models.AcceptedJob.list({ filter: { jobid: { eq: jobId } } }),
+          client.models.User.list(),
+        ]);
 
         const acceptedApps = acceptedRes.data?.filter(Boolean) ?? [];
+        const users = usersRes.data?.filter(Boolean) ?? [];
 
-        const appList = acceptedApps.map((app) => ({
-          applicantId: app.userid ?? "Unknown user",
+        const userMap = new Map<string, string>();
+        users.forEach((user) => {
+          const fullName = `${user.firstname ?? ""} ${user.surname ?? ""}`.trim();
+          if (user.sub) userMap.set(user.sub, fullName || "Unnamed user");
+        });
+
+        const appList: ApplicationWithExtras[] = acceptedApps.map((app) => ({
+          id: app.id!,
+          userId: app.userid ?? "unknown",
+          fullName: userMap.get(app.userid ?? "") ?? "Unknown user",
           applicationText: app.applytext ?? "",
+          status: app.status ?? "pending",
         }));
 
         setApplications(appList);
@@ -62,6 +77,32 @@ export default function TrackApplicationsPage({ params }: { params: { id: string
 
     fetchData();
   }, [jobId]);
+
+  async function handleDecision(appId: string, applicantId: string, action: "accepted" | "rejected") {
+    try {
+      // Update status in AcceptedJob
+      await client.models.AcceptedJob.update({
+        id: appId,
+        status: action,
+      });
+
+      // Send notification
+      await client.models.Notification.create({
+        userid: applicantId,
+        notiftitle: `Your application was ${action}`,
+        notifdescription: `Your application to "${jobTitle}" was ${action}.`,
+      });
+
+      // Update local UI
+      setApplications((prev) =>
+        prev.map((app) =>
+          app.id === appId ? { ...app, status: action } : app
+        )
+      );
+    } catch (err) {
+      console.error(`Failed to ${action} application:`, err);
+    }
+  }
 
   return (
     <main className="container">
@@ -75,11 +116,26 @@ export default function TrackApplicationsPage({ params }: { params: { id: string
           applications.map((app, index) => (
             <div key={index} className="notif-card">
               <p>
-                <strong>{app.applicantId}</strong> applied to this job.
+                <strong>{app.fullName}</strong> applied to this job.
                 <br />
                 <br />
                 <em>{app.applicationText}</em>
               </p>
+
+              {app.status === "pending" ? (
+                <div className="actions">
+                  <button onClick={() => handleDecision(app.id, app.userId, "accepted")}>
+                    Accept
+                  </button>
+                  <button onClick={() => handleDecision(app.id, app.userId, "rejected")}>
+                    Reject
+                  </button>
+                </div>
+              ) : (
+                <p>
+                  <strong>Status:</strong> {app.status === "accepted" ? "Accepted" : "Rejected"}
+                </p>
+              )}
             </div>
           ))}
       </section>

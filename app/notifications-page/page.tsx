@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
+import { getCurrentUser } from "aws-amplify/auth";
 import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
-import { getCurrentUser } from "aws-amplify/auth";
 import "../app.css";
 
 Amplify.configure(outputs);
@@ -15,6 +15,7 @@ type YourApplication = {
   jobTitle: string;
   jobId: string;
   applytext?: string | null;
+  status?: string;
 };
 
 type ApplicationToYourJob = {
@@ -93,6 +94,7 @@ export default function NotificationsPage() {
               jobTitle: job?.title || "Unknown job",
               jobId: app.jobid,
               applytext: app.applytext ?? null,
+              status: app.status ?? "pending",
             };
           });
 
@@ -112,7 +114,7 @@ export default function NotificationsPage() {
 
         setJobCommentNotifs(jobComments);
 
-        //  Replies to your comments
+        // Replies to your comments
         const yourComments = allComments.filter((c) => c.userid === sub);
         const yourCommentIds = yourComments.map((c) => c.id);
 
@@ -141,7 +143,7 @@ export default function NotificationsPage() {
       <section className="content">
         <h2>Notifications</h2>
 
-        
+        {/* Applications to Your Jobs */}
         <div className="notif-section">
           <h3>Applications to Your Jobs</h3>
           {applicationsToYourJobs.length === 0 ? (
@@ -163,6 +165,7 @@ export default function NotificationsPage() {
           )}
         </div>
 
+        {/* Your Applications */}
         <div className="notif-section">
           <h3>Your Job Applications</h3>
           {yourApplications.length === 0 ? (
@@ -178,11 +181,22 @@ export default function NotificationsPage() {
                     <strong>Message:</strong> {app.applytext}
                   </p>
                 )}
+                <p>
+                  <strong>Status:</strong>{" "}
+                  {app.status === "accepted" ? (
+                    <span className="accepted">Accepted</span>
+                  ) : app.status === "rejected" ? (
+                    <span className="rejected">Rejected</span>
+                  ) : (
+                    <span className="pending">Pending</span>
+                  )}
+                </p>
               </div>
             ))
           )}
         </div>
 
+        {/* Comments on Your Jobs */}
         <div className="notif-section">
           <h3>Comments on Your Jobs</h3>
           {jobCommentNotifs.length === 0 ? (
@@ -202,6 +216,7 @@ export default function NotificationsPage() {
           )}
         </div>
 
+        {/* Replies to Your Comments */}
         <div className="notif-section">
           <h3>Replies to Your Comments</h3>
           {commentReplyNotifs.length === 0 ? (
