@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { getCurrentUser } from "aws-amplify/auth";
+import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
 
 type AuthContextType = {
@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const checkUser = async () => {
     try {
+      await fetchAuthSession();
       await getCurrentUser();
       setIsLoggedIn(true);
     } catch {
@@ -33,7 +34,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     checkUser();
 
     const unsubscribe = Hub.listen("auth", () => {
-      checkUser(); // Update login state on sign in/out events
+      checkUser(); // Update login state on auth changes
     });
 
     return () => unsubscribe();
