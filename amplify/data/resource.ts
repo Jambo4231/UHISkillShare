@@ -80,6 +80,7 @@ const schema = a.schema({
       userid: a.string().required(),
       commenttext: a.string().required(),
       commenttime: a.timestamp().required(),
+      parentid: a.string(),
     })
     .authorization((allow) => [
       allow.authenticated(),
