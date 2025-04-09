@@ -8,7 +8,7 @@ import { Amplify } from "aws-amplify";
 import { getCurrentUser } from "aws-amplify/auth";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
-import "../../app.css";
+import "../app.css";
 
 Amplify.configure(outputs);
 
