@@ -45,6 +45,7 @@ const schema = a.schema({
       jobid: a.string().required(),
       userid: a.string().required(),
       applytext: a.string(),
+      status: a.string().default("pending") 
     })
     .authorization((allow) => [
       allow.authenticated(),
