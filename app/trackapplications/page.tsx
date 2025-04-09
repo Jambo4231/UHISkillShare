@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import { Amplify } from "aws-amplify";
-import Auth from "aws-amplify/auth";
+import { getCurrentUser } from "aws-amplify/auth";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import "../../app.css";
@@ -15,26 +15,24 @@ Amplify.configure(outputs);
 const client = generateClient<Schema>();
 
 export default function TrackApplicationsPage() {
-	const [userId, setUserId] = useState<string | null>(null);
-	const [yourApplications, setYourApplications] = useState< 
-		Schema["AcceptedJob"]["type"][] 
-	>([]);
-	const [applicationsToYourJobs, setApplicationsToYourJobs] = useState< 
-		{ jobTitle: string; applicantId: string; applicationText: string }[] 
-	>([]);
-	const [applicationsToOtherJobs, setApplicationsToOtherJobs] = useState< 
-		{ jobTitle: string; applicationText: string }[] 
-	>([]);
-	
-	const router = useRouter();
-	
-	useEffect(() => {
+  const [userId, setUserId] = useState<string | null>(null);
+  const [yourApplications, setYourApplications] = useState<
+    Schema["AcceptedJob"]["type"][]
+  >([]);
+  const [applicationsToYourJobs, setApplicationsToYourJobs] = useState<
+    { jobTitle: string; applicantId: string; applicationText: string }[]
+  >([]);
+  const [applicationsToOtherJobs, setApplicationsToOtherJobs] = useState<
+    { jobTitle: string; applicationText: string }[]
+  >([]);
+
+  const router = useRouter();
+
+  useEffect(() => {
     async function fetchData() {
       try {
-        // Get Cognito user ID (sub)
         const { userId: sub } = await getCurrentUser();
 
-        // Look up user in User table by sub
         const userRes = await client.models.User.list({
           filter: { sub: { eq: sub } },
         });
@@ -48,7 +46,6 @@ export default function TrackApplicationsPage() {
         const currentUserId = user.id;
         setUserId(currentUserId);
 
-        // Fetch all jobs and accepted applications
         const [jobRes, acceptedRes] = await Promise.all([
           client.models.Job.list(),
           client.models.AcceptedJob.list(),
@@ -56,57 +53,43 @@ export default function TrackApplicationsPage() {
 
         const allJobs = jobRes.data;
         const allApplications = acceptedRes.data;
-		
-		
-		// Applications made BY this user
+
         const yourApps = allApplications.filter(
           (app) => app.userid === currentUserId
         );
         setYourApplications(yourApps);
 
-        // Jobs created BY this user
         const yourJobs = allJobs.filter((job) => job.userid === currentUserId);
 
-        // Applications TO your jobs
         const appsToYourJobs = allApplications
-          .filter((app) =>
-            yourJobs.some((job) => job.id === app.jobid)
-          )
+          .filter((app) => yourJobs.some((job) => job.id === app.jobid))
           .map((app) => {
             const job = yourJobs.find((j) => j.id === app.jobid);
             return {
-              jobTitle: job?.title || "Unknown job",
-              applicantId: app.userid,
-			  applicationText: app.applytext,
-            };
-          });
-		  
-		 // Jobs YOU applied to
-		 const appsToOtherJobs = allApplications
-          .filter((app) =>
-            yourApps.some((app) => app.userid === currentUserId)
-          )
-          .map((app) => {
-            const job = allJobs.find((j) => j.id === app.jobid);
-            return {
-              jobTitle: job?.title || "Unknown job",
-			  applicationText: app.applytext,
+              jobTitle: job?.title ?? "Unknown job",
+              applicantId: app.userid ?? "Unknown user",
+              applicationText: app.applytext ?? "",
             };
           });
 
+        const appsToOtherJobs = yourApps.map((app) => {
+          const job = allJobs.find((j) => j.id === app.jobid);
+          return {
+            jobTitle: job?.title ?? "Unknown job",
+            applicationText: app.applytext ?? "",
+          };
+        });
+
         setApplicationsToYourJobs(appsToYourJobs);
+        setApplicationsToOtherJobs(appsToOtherJobs);
       } catch (error) {
-        console.error("Error loading people's applications:", error);
-      }
-	  setApplicationsToOtherJobs(appsToOtherJobs);
-      } catch (error) {
-        console.error("Error loading your applications:", error);
+        console.error("Error loading applications:", error);
       }
     }
 
     fetchData();
   }, []);
-  
+
   return (
     <main className="container">
       <nav className="navbar">
@@ -129,17 +112,17 @@ export default function TrackApplicationsPage() {
       <section className="content">
         <h2>All Applications</h2>
 
-		// Applications to your jobs
+        {/* Applications to your jobs */}
         <div className="notif-section">
           {applicationsToYourJobs.length === 0 ? (
             <p>No one has applied to your jobs yet.</p>
           ) : (
             applicationsToYourJobs.map((notif, index) => (
               <div key={index} className="notif-card">
-				<h3>{notif.jobTitle}</h3>
+                <h3>{notif.jobTitle}</h3>
                 <p>
                   <strong>{notif.applicantId}</strong> applied to your job.
-				  <br><br>
+                  <br /><br />
                   <em>{notif.applicationText}</em>
                 </p>
               </div>
@@ -147,17 +130,17 @@ export default function TrackApplicationsPage() {
           )}
         </div>
 
-		// Applications to other jobs
+        {/* Applications to other jobs */}
         <div className="notif-section">
-          {appsToOtherJobs.length === 0 ? (
+          {applicationsToOtherJobs.length === 0 ? (
             <p>You haven't applied to any jobs yet.</p>
           ) : (
-            appsToOtherJobs.map((job, app) => (
-              <div key={app.id} className="notif-card">
+            applicationsToOtherJobs.map((application, index) => (
+              <div key={index} className="notif-card">
                 <p>
-                  You applied to job: <strong>{job.jobTitle}</strong>.
-				  <br><br>
-                  <em>{app.applicationText}</em>
+                  You applied to job: <strong>{application.jobTitle}</strong>.
+                  <br /><br />
+                  <em>{application.applicationText}</em>
                 </p>
               </div>
             ))

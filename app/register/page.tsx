@@ -37,7 +37,7 @@ export default function RegisterPage() {
         },
       });
 
-      console.log("✅ signUp success:", result);
+      console.log("signUp success:", result);
 
       // Store extra details locally so they can be saved in User table after confirmation
       localStorage.setItem(
@@ -53,89 +53,94 @@ export default function RegisterPage() {
         })
       );
 
-      alert("Registration successful! Please verify your email before logging in.");
+      alert(
+        "Registration successful! Please verify your email before logging in."
+      );
       router.push("/confirm");
     } catch (error) {
-      console.error("❌ signUp failed:", error);
+      console.error("signUp failed:", error);
       alert("Sign up failed: " + (error as Error).message);
     }
   }
 
   return (
     <main className="container">
-      
       <div className="form-container">
         <h2>Create a New Account</h2>
         <form onSubmit={handleSubmit}>
           <label>
             UHI Email <span className="required">*Required</span>
           </label>
-            <input
-              type="email"
-              value={email}
-              required
-              onChange={(e) => setEmail(e.target.value)}
-            />
+          <input
+            type="email"
+            value={email}
+            required
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
           <label>
             Username <span className="required">*Required</span>
           </label>
-            <input
-              type="text"
-              value={username}
-              required
-              onChange={(e) => setUsername(e.target.value)}
-            />
+          <input
+            type="text"
+            value={username}
+            required
+            onChange={(e) => setUsername(e.target.value)}
+          />
 
           <label>
             First Name <span className="required">*Required</span>
           </label>
-            <input
-              type="text"
-              value={firstname}
-              required
-              onChange={(e) => setFirstname(e.target.value)}
-            />
+          <input
+            type="text"
+            value={firstname}
+            required
+            onChange={(e) => setFirstname(e.target.value)}
+          />
 
           <label>
             Surname <span className="required">*Required</span>
           </label>
-            <input
-              type="text"
-              value={surname}
-              required
-              onChange={(e) => setSurname(e.target.value)}
-            />
+          <input
+            type="text"
+            value={surname}
+            required
+            onChange={(e) => setSurname(e.target.value)}
+          />
 
           <label>
             College <span className="required">*Required</span>
           </label>
-            <input
-              type="text"
-              value={college}
-              required
-              onChange={(e) => setCollege(e.target.value)}
-            />
+          <input
+            type="text"
+            value={college}
+            required
+            onChange={(e) => setCollege(e.target.value)}
+          />
 
           <label>
             Area of Study <span className="required">*Required</span>
           </label>
-            <input
-              type="text"
-              value={areaofstudy}
-              required
-              onChange={(e) => setAreaOfStudy(e.target.value)}
-            />
+          <input
+            type="text"
+            value={areaofstudy}
+            required
+            onChange={(e) => setAreaOfStudy(e.target.value)}
+          />
 
           <label>
             Password <span className="required">*Required</span>
           </label>
-            <input
-              type="password"
-              value={password}
-              required
-              onChange={(e) => setPassword(e.target.value)}
-            />
+          <small className="password-policy">
+            Must be at least 8 characters, including upper and lower case
+            letters, numbers, and a special character.
+          </small>
+          <input
+            type="password"
+            value={password}
+            required
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
           <button type="submit">Register</button>
         </form>
