@@ -6,7 +6,7 @@ import { useAuth } from "../src/context/AuthContext";
 
 const Navbar = () => {
   const router = useRouter();
-  const { isLoggedIn } = useAuth(); 
+  const { isLoggedIn, loading } = useAuth(); 
 
   const handleLogout = async () => {
     try {
@@ -16,6 +16,8 @@ const Navbar = () => {
       console.error("Error signing out:", error);
     }
   };
+
+  if (loading) return <div className="navbar-placeholder">Loading...</div>;
 
   return (
     <nav className="navbar">

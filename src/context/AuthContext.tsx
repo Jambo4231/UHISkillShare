@@ -6,12 +6,17 @@ import { Hub } from "aws-amplify/utils";
 
 type AuthContextType = {
   isLoggedIn: boolean;
+  loading: boolean;
 };
 
-const AuthContext = createContext<AuthContextType>({ isLoggedIn: false });
+const AuthContext = createContext<AuthContextType>({
+  isLoggedIn: false,
+  loading: true,
+});
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const checkUser = async () => {
     try {
@@ -19,6 +24,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoggedIn(true);
     } catch {
       setIsLoggedIn(false);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -26,14 +33,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     checkUser();
 
     const unsubscribe = Hub.listen("auth", () => {
-      checkUser(); // updates on sign in/out events
+      checkUser(); // Update login state on sign in/out events
     });
 
     return () => unsubscribe();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn }}>
+    <AuthContext.Provider value={{ isLoggedIn, loading }}>
       {children}
     </AuthContext.Provider>
   );
