@@ -43,12 +43,13 @@ export default function MyJobsPage() {
   }, []);
 
   function handleEdit(jobId: string) {
-    router.push(`/edit-job/${jobId}`);
+    router.push(`/manage-jobs/[id]/${jobId}`);
   }
 
   function handleView(jobId: string) {
-    router.push(`/job-details/${jobId}`);
+    router.push(`/trackapplications/${jobId}`);
   }
+  
 
   return (
     <main className="container">
@@ -74,8 +75,8 @@ export default function MyJobsPage() {
                 </span>
               </p>
               <div className="job-actions">
-                <button onClick={() => handleView(job.id)}>View</button>
-                <button onClick={() => handleEdit(job.id)}>Edit</button>
+                <button onClick={() => handleView(job.id)}>View Applications</button>
+                <button onClick={() => handleEdit(job.id)}>Manage Job</button>
               </div>
             </div>
           ))}

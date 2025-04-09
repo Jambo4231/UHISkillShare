@@ -81,7 +81,7 @@ export default function JobsPage() {
 
       setJobs(enrichedJobs);
     } catch (err) {
-      console.error("❌ Error fetching jobs:", err);
+      console.error("Error fetching jobs:", err);
     }
   }
 
