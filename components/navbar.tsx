@@ -1,45 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { signOut, getCurrentUser } from "aws-amplify/auth";
-import { useEffect, useState } from "react";
-import { Hub } from "aws-amplify/utils";
+import { signOut } from "aws-amplify/auth";
+import { useAuth } from "../src/context/AuthContext"; 
 
 const Navbar = () => {
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
-
-  // Check if user is logged in
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        await getCurrentUser();
-        setIsLoggedIn(true);
-      } catch {
-        setIsLoggedIn(false);
-      }
-    };
-
-    checkAuth();
-
-    const unsubscribe = Hub.listen("auth", (data: any) => {
-      switch (data.payload.event) {
-        case "signedIn":
-        case "tokenRefresh":
-          setIsLoggedIn(true);
-          break;
-        case "signedOut":
-        case "signIn_failure":
-        case "tokenRefresh_failure":
-          setIsLoggedIn(false);
-          break;
-      }
-    });
-
-    return () => {
-      unsubscribe(); 
-    };
-  }, []);
+  const { isLoggedIn } = useAuth(); 
 
   const handleLogout = async () => {
     try {
@@ -61,7 +28,7 @@ const Navbar = () => {
         />
       </a>
       <div className="nav-links">
-        {isLoggedIn && (
+        {isLoggedIn ? (
           <>
             <button onClick={() => router.push("/create-new-job")}>
               + New Job
@@ -80,8 +47,7 @@ const Navbar = () => {
               Logout
             </button>
           </>
-        )}
-        {isLoggedIn === false && (
+        ) : (
           <a href="/login" className="login-button">
             Login
           </a>

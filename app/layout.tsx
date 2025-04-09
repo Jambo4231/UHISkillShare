@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Nunito_Sans } from 'next/font/google';
 import AmplifyProvider from '../components/AmplifyProvider';
 import Navbar from '../components/navbar';
+import { AuthProvider } from '../src/context/AuthContext'; 
 
 const nunito = Nunito_Sans({
   subsets: ['latin'],
@@ -10,7 +11,7 @@ const nunito = Nunito_Sans({
   display: 'swap',
 });
 
-// PWA metadata
+//  PWA metadata
 export const metadata: Metadata = {
   title: 'UHI Skill Share',
   description: 'Student skill-sharing platform',
@@ -32,8 +33,10 @@ export default function RootLayout({
       <head />
       <body className={nunito.className}>
         <AmplifyProvider>
-          <Navbar />
-          {children}
+          <AuthProvider> 
+            <Navbar />
+            {children}
+          </AuthProvider>
         </AmplifyProvider>
       </body>
     </html>
