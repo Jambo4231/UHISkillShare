@@ -17,7 +17,9 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
   const { id } = params;
   const [job, setJob] = useState<Schema["Job"]["type"] | null>(null);
   const [posterName, setPosterName] = useState("Loading...");
-  const [comments, setComments] = useState<(Schema["Comment"]["type"] & { fullName?: string })[]>([]);
+  const [comments, setComments] = useState<
+    (Schema["Comment"]["type"] & { fullName?: string })[]
+  >([]);
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -82,7 +84,10 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
               const user = userRes.data?.[0];
               const firstname = user?.firstname ?? "";
               const surname = user?.surname ?? "";
-              const fullName = [firstname, surname].filter(Boolean).join(" ").trim();
+              const fullName = [firstname, surname]
+                .filter(Boolean)
+                .join(" ")
+                .trim();
               return { ...comment, fullName: fullName || "Unknown user" };
             } catch {
               return { ...comment, fullName: "Unknown user" };
@@ -125,8 +130,30 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
         ...response.data,
         commenttime: timestamp,
         fullName:
-          [currentUser?.firstname, currentUser?.surname].filter(Boolean).join(" ").trim() || "Unknown user",
+          [currentUser?.firstname, currentUser?.surname]
+            .filter(Boolean)
+            .join(" ")
+            .trim() || "Unknown user",
       };
+
+      if (!replyTo && job?.userid && job.userid !== userId) {
+        await client.models.Notification.create({
+          userid: job.userid,
+          notiftitle: "New comment on your job",
+          notifdescription: `Someone commented on "${job.title}"`,
+        });
+      }
+
+      if (replyTo) {
+        const parentComment = comments.find((c) => c.id === replyTo);
+        if (parentComment && parentComment.userid !== userId) {
+          await client.models.Notification.create({
+            userid: parentComment.userid,
+            notiftitle: "You received a reply",
+            notifdescription: `Someone replied to your comment on "${job?.title}"`,
+          });
+        }
+      }
 
       setComments((prev) => [...prev, newPostedComment]);
       setNewComment("");
@@ -141,20 +168,24 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
   if (!job) return <p>Loading job details...</p>;
 
   const topLevelComments = comments.filter((c) => !c.parentid);
-  const repliesMap = comments.reduce((acc, comment) => {
-    if (comment.parentid) {
-      if (!acc[comment.parentid]) acc[comment.parentid] = [];
-      acc[comment.parentid].push(comment);
-    }
-    return acc;
-  }, {} as Record<string, typeof comments>);
+  const repliesMap = comments.reduce(
+    (acc, comment) => {
+      if (comment.parentid) {
+        if (!acc[comment.parentid]) acc[comment.parentid] = [];
+        acc[comment.parentid].push(comment);
+      }
+      return acc;
+    },
+    {} as Record<string, typeof comments>
+  );
 
   return (
     <main className="container">
       <div className="job-details">
         <h2>{job.title}</h2>
         <p className="poster">
-          Posted by: <strong>{posterName}</strong> • {job.subject || "No Subject"}
+          Posted by: <strong>{posterName}</strong> •{" "}
+          {job.subject || "No Subject"}
         </p>
         <p className="job-body">{job.description}</p>
 
@@ -175,7 +206,10 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
           )}
         </div>
 
-        <button className="apply-button" onClick={() => router.push(`/job-application/${id}`)}>
+        <button
+          className="apply-button"
+          onClick={() => router.push(`/job-application/${id}`)}
+        >
           Apply for Job / Share UHI Email
         </button>
 
@@ -193,9 +227,10 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
                       : "Unknown time"}
                   </span>
                   <div>
-                    <button onClick={() => setReplyTo(comment.id)}>Reply</button>
+                    <button onClick={() => setReplyTo(comment.id)}>
+                      Reply
+                    </button>
                   </div>
-
                   {repliesMap[comment.id]?.length > 0 && (
                     <ul className="replies">
                       {repliesMap[comment.id].map((reply) => (

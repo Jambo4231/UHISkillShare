@@ -9,7 +9,6 @@ import { getCurrentUser } from "aws-amplify/auth";
 import "../app.css";
 
 Amplify.configure(outputs);
-
 const client = generateClient<Schema>();
 
 type YourApplication = {
@@ -24,26 +23,41 @@ type ApplicationToYourJob = {
   applytext?: string | null;
 };
 
+type JobCommentNotification = {
+  jobTitle: string;
+  commenter: string;
+  commentText: string;
+};
+
+type CommentReplyNotification = {
+  jobTitle: string;
+  replier: string;
+  replyText: string;
+};
+
 export default function NotificationsPage() {
   const [yourApplications, setYourApplications] = useState<YourApplication[]>([]);
   const [applicationsToYourJobs, setApplicationsToYourJobs] = useState<ApplicationToYourJob[]>([]);
+  const [jobCommentNotifs, setJobCommentNotifs] = useState<JobCommentNotification[]>([]);
+  const [commentReplyNotifs, setCommentReplyNotifs] = useState<CommentReplyNotification[]>([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
         const { userId: sub } = await getCurrentUser();
 
-        const [jobsRes, acceptedRes, usersRes] = await Promise.all([
+        const [jobsRes, acceptedRes, usersRes, commentsRes] = await Promise.all([
           client.models.Job.list(),
           client.models.AcceptedJob.list(),
           client.models.User.list(),
+          client.models.Comment.list(),
         ]);
 
         const allJobs = jobsRes.data?.filter(Boolean) ?? [];
         const allApplications = acceptedRes.data?.filter(Boolean) ?? [];
         const allUsers = usersRes.data?.filter(Boolean) ?? [];
+        const allComments = commentsRes.data?.filter(Boolean) ?? [];
 
-        // Map user.sub → username
         const userMap = new Map<string, string>();
         allUsers.forEach((user) => {
           if (user.sub && user.username) {
@@ -51,7 +65,7 @@ export default function NotificationsPage() {
           }
         });
 
-        // Jobs created by current user (matched by Cognito sub)
+        // Jobs created by current user
         const myJobs = allJobs.filter((job) => job.userid === sub);
         const myJobIds = myJobs.map((job) => job.id);
 
@@ -83,6 +97,37 @@ export default function NotificationsPage() {
           });
 
         setYourApplications(yourApps);
+
+        // Comments on your job postings
+        const jobComments: JobCommentNotification[] = allComments
+          .filter((comment) => myJobIds.includes(comment.jobid) && comment.userid !== sub)
+          .map((comment) => {
+            const job = allJobs.find((j) => j.id === comment.jobid);
+            return {
+              jobTitle: job?.title || "Unknown job",
+              commenter: userMap.get(comment.userid) || "Unknown user",
+              commentText: comment.commenttext,
+            };
+          });
+
+        setJobCommentNotifs(jobComments);
+
+        //  Replies to your comments
+        const yourComments = allComments.filter((c) => c.userid === sub);
+        const yourCommentIds = yourComments.map((c) => c.id);
+
+        const repliesToYou: CommentReplyNotification[] = allComments
+          .filter((comment) => comment.parentid && yourCommentIds.includes(comment.parentid) && comment.userid !== sub)
+          .map((comment) => {
+            const job = allJobs.find((j) => j.id === comment.jobid);
+            return {
+              jobTitle: job?.title || "Unknown job",
+              replier: userMap.get(comment.userid) || "Unknown user",
+              replyText: comment.commenttext,
+            };
+          });
+
+        setCommentReplyNotifs(repliesToYou);
       } catch (err) {
         console.error("Error loading notifications:", err);
       }
@@ -96,6 +141,7 @@ export default function NotificationsPage() {
       <section className="content">
         <h2>Notifications</h2>
 
+        
         <div className="notif-section">
           <h3>Applications to Your Jobs</h3>
           {applicationsToYourJobs.length === 0 ? (
@@ -132,6 +178,44 @@ export default function NotificationsPage() {
                     <strong>Message:</strong> {app.applytext}
                   </p>
                 )}
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="notif-section">
+          <h3>Comments on Your Jobs</h3>
+          {jobCommentNotifs.length === 0 ? (
+            <p>No comments on your jobs yet.</p>
+          ) : (
+            jobCommentNotifs.map((notif, index) => (
+              <div key={index} className="notif-card">
+                <p>
+                  <strong>{notif.commenter}</strong> commented on your job{" "}
+                  <em>{notif.jobTitle}</em>:
+                </p>
+                <p>
+                  <em>"{notif.commentText}"</em>
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="notif-section">
+          <h3>Replies to Your Comments</h3>
+          {commentReplyNotifs.length === 0 ? (
+            <p>No replies to your comments yet.</p>
+          ) : (
+            commentReplyNotifs.map((notif, index) => (
+              <div key={index} className="notif-card">
+                <p>
+                  <strong>{notif.replier}</strong> replied to your comment on{" "}
+                  <em>{notif.jobTitle}</em>:
+                </p>
+                <p>
+                  <em>"{notif.replyText}"</em>
+                </p>
               </div>
             ))
           )}
