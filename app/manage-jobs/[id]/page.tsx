@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getCurrentUser } from "aws-amplify/auth";
 import { generateClient } from "aws-amplify/data";
-import "../app.css";
+import "../../app.css";
 import type { Schema } from "@/amplify/data/resource";
 
 const client = generateClient<Schema>();
