@@ -43,7 +43,7 @@ export default function MyJobsPage() {
   }, []);
 
   function handleEdit(jobId: string) {
-    router.push(`/manage-jobs/[id]/${jobId}`);
+    router.push(`/manage-jobs/${jobId}`);
   }
 
   function handleView(jobId: string) {
