@@ -37,7 +37,7 @@ export default function CreateNewJob() {
     try {
       const { userId: sub } = await getCurrentUser();
 
-      console.log("🔍 Looking up user with sub:", sub);
+      console.log("Looking up user with sub:", sub);
 
       const userResult = await client.models.User.list({
         filter: { sub: { eq: sub } },
@@ -46,12 +46,12 @@ export default function CreateNewJob() {
       const user = userResult.data?.[0];
 
       if (!user) {
-        console.error("❌ User not found in database for sub:", sub);
+        console.error("User not found in database for sub:", sub);
         alert("Your user profile could not be found. Please log out and try again.");
         return;
       }
 
-      console.log("✅ Matched user:", user);
+      console.log("Matched user:", user);
 
       await client.models.Job.create({
         title,
@@ -61,10 +61,10 @@ export default function CreateNewJob() {
         userid: user.sub,   
       });
 
-      console.log("📬 Job created successfully");
+      console.log("Job created successfully");
       router.push("/jobs-page");
     } catch (error) {
-      console.error("❌ Error creating job:", error);
+      console.error("Error creating job:", error);
       alert("Something went wrong while creating the job.");
     }
   }
