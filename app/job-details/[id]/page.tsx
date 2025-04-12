@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
@@ -19,6 +20,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
 
   const [job, setJob] = useState<Schema["Job"]["type"] | null>(null);
   const [posterName, setPosterName] = useState("Loading...");
+  const [posterSub, setPosterSub] = useState<string | null>(null);
   const [comments, setComments] = useState<
     (Schema["Comment"]["type"] & { fullName?: string; averageRating?: number })[]
   >([]);
@@ -54,6 +56,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
         const user = result.data?.[0];
         const fullName = [user?.firstname, user?.surname].filter(Boolean).join(" ").trim();
         setPosterName(fullName || "Unknown user");
+        setPosterSub(user?.sub || null);
       } catch {
         setPosterName("Unknown user");
       }
@@ -218,7 +221,15 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
       <div className="job-details">
         <h2>{job.title}</h2>
         <p className="poster">
-          Posted by: <strong>{posterName}</strong> • {job.subject || "No Subject"}
+          Posted by:{" "}
+          {posterSub ? (
+            <Link href={`/user-profile/${posterSub}`}>
+              <strong className="hover:underline cursor-pointer">{posterName}</strong>
+            </Link>
+          ) : (
+            <strong>{posterName}</strong>
+          )}{" "}
+          • {job.subject || "No Subject"}
         </p>
         <p className="job-body">{job.description}</p>
         {job.deadline && (
@@ -254,7 +265,9 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
             <ul>
               {topLevelComments.map((comment) => (
                 <li key={comment.id}>
-                  <strong>{comment.fullName}</strong>: {comment.commenttext}
+                  <Link href={`/user-profile/${comment.userid}`}>
+                    <strong className="hover:underline cursor-pointer">{comment.fullName}</strong>
+                  </Link>: {comment.commenttext}
                   <br />
                   <span className="timestamp">
                     {typeof comment.commenttime === "number"
