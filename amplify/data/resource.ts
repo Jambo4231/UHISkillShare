@@ -45,7 +45,7 @@ const schema = a.schema({
       jobid: a.string().required(),
       userid: a.string().required(),
       applytext: a.string(),
-      status: a.string().default("pending") 
+      status: a.string().default("pending"),
     })
     .authorization((allow) => [
       allow.authenticated(),
@@ -82,6 +82,17 @@ const schema = a.schema({
       commenttext: a.string().required(),
       commenttime: a.timestamp().required(),
       parentid: a.string(),
+    })
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.publicApiKey().to(["read"]),
+    ]),
+
+  CommentRating: a
+    .model({
+      commentid: a.string().required(),
+      ratinguserid: a.string().required(),
+      rating: a.integer().required(), // 1 to 5
     })
     .authorization((allow) => [
       allow.authenticated(),
