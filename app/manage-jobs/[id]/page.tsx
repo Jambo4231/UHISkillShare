@@ -28,7 +28,7 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
       try {
         const user = await getCurrentUser();
         console.log("Fetched user:", user);
-        setUserId(user.userId || user.username); // fallback in case userId is undefined
+        setUserId(user.userId || user.username);
 
         const result = await client.models.Job.get({ id: id as string });
         if (result?.data) {
@@ -70,13 +70,14 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
       subject: formData.subject,
       deadline: formData.deadline,
       userid: userId,
-      status: job.status, // keep existing status
+      status: job.status,
     };
 
     try {
       console.log("Sending update payload:", updatePayload);
       await client.models.Job.update(updatePayload);
       alert("Job has been updated successfully.");
+      router.push("/my-jobs"); 
     } catch (err) {
       console.error("Update failed", err);
       alert("Failed to update job.");
@@ -90,8 +91,8 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
     try {
       await client.models.Job.update({
         id: id as string,
-        status: 2, // 2 = complete
-        userid: userId, // still required
+        status: 2,
+        userid: userId,
       });
       alert("Job marked as complete.");
       router.push("/my-jobs");
