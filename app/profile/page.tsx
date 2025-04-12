@@ -26,7 +26,7 @@ export default function ProfilePage() {
     async function fetchUser() {
       try {
         const session = await fetchAuthSession();
-        const userId = session?.tokens?.idToken?.payload["sub"]; // Get logged-in user ID
+        const userId = session?.tokens?.idToken?.payload["sub"]; 
 
         if (!userId) throw new Error("User ID not found in session");
 
@@ -40,18 +40,17 @@ export default function ProfilePage() {
 
         setUser(userData);
 
-        // Fetch related jobs/comments using user's internal model ID
         const [jobs, acceptedJobs, comments] = await Promise.all([
-          client.models.Job.list({ filter: { userid: { eq: userData.id } } }),
+          client.models.Job.list({ filter: { userid: { eq: userData.sub } } }),
           client.models.AcceptedJob.list({ filter: { userid: { eq: userData.id } } }),
-          client.models.Comment.list({ filter: { userid: { eq: userData.id } } }),
+          client.models.Comment.list({ filter: { userid: { eq: userData.sub } } }),
         ]);
 
         setJobsPosted(jobs.data?.length || 0);
         setJobsUndertaken(acceptedJobs.data?.length || 0);
         setCommentsCount(comments.data?.length || 0);
       } catch (err: any) {
-        console.error("❌ Error loading user:", err);
+        console.error("Error loading user:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -66,8 +65,6 @@ export default function ProfilePage() {
 
   return (
     <main className="container">
-      
-
       <div className="max-w-4xl mx-auto bg-white shadow-md p-6 mt-6 rounded-lg">
         <div className="flex gap-6">
           <div className="profile-header">
@@ -102,12 +99,12 @@ export default function ProfilePage() {
           <p>Jobs Undertaken: <span>{jobsUndertaken}</span></p>
           <p>Comments: <span>{commentsCount}</span></p>
         </div>
-		
-		<div className="update-profile-link">
-		  <button onClick={() => router.push("/updateProfile")}>
-			Update Profile
-		  </button>
-		</div>
+        
+        <div className="update-profile-link">
+          <button onClick={() => router.push("/updateProfile")}>
+            Update Profile
+          </button>
+        </div>
       </div>
     </main>
   );
