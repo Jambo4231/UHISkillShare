@@ -23,7 +23,6 @@ export default function MyJobsPage() {
       try {
         setLoading(true);
 
-        // Get Cognito user sub directly
         const { userId: sub } = await getCurrentUser();
 
         const jobRes = await client.models.Job.list({
@@ -49,7 +48,6 @@ export default function MyJobsPage() {
   function handleView(jobId: string) {
     router.push(`/trackapplications/${jobId}`);
   }
-  
 
   return (
     <main className="container">
@@ -68,12 +66,21 @@ export default function MyJobsPage() {
             <div key={job.id} className="job-card">
               <h3>{job.title}</h3>
               <p>{job.description}</p>
+
+              {job.deadline && (
+                <p>
+                  <strong>Deadline:</strong>{" "}
+                  {new Date(job.deadline).toLocaleDateString("en-GB")}
+                </p>
+              )}
+
               <p>
                 <strong>Status:</strong>{" "}
                 <span className={job.status === 1 ? "open" : "closed"}>
                   {job.status === 1 ? "Unresolved" : "Resolved"}
                 </span>
               </p>
+
               <div className="job-actions">
                 <button onClick={() => handleView(job.id)}>View Applications</button>
                 <button onClick={() => handleEdit(job.id)}>Manage Job</button>

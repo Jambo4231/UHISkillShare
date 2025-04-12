@@ -189,6 +189,13 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
         </p>
         <p className="job-body">{job.description}</p>
 
+        {job.deadline && (
+          <p className="deadline">
+            <strong>Deadline:</strong>{" "}
+            {new Date(job.deadline).toLocaleDateString("en-GB")}
+          </p>
+        )}
+
         <div className="comment-section">
           <h3>{replyTo ? "Reply to Comment" : "Leave a Comment"}</h3>
           <textarea
@@ -223,7 +230,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
                   <br />
                   <span className="timestamp">
                     {typeof comment.commenttime === "number"
-                      ? new Date(comment.commenttime).toLocaleString()
+                      ? new Date(comment.commenttime).toLocaleString("en-GB")
                       : "Unknown time"}
                   </span>
                   <div>
@@ -239,7 +246,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
                           <br />
                           <span className="timestamp">
                             {typeof reply.commenttime === "number"
-                              ? new Date(reply.commenttime).toLocaleString()
+                              ? new Date(reply.commenttime).toLocaleString("en-GB")
                               : "Unknown time"}
                           </span>
                         </li>

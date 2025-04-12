@@ -29,6 +29,7 @@ export default function CreateNewJob() {
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState(subjectOptions[0]);
   const [description, setDescription] = useState("");
+  const [deadline, setDeadline] = useState("");
   const router = useRouter();
 
   async function handleSubmit(event: React.FormEvent) {
@@ -57,8 +58,9 @@ export default function CreateNewJob() {
         title,
         subject,
         description,
+        deadline: deadline || undefined,
         status: 1,
-        userid: user.sub,   
+        userid: user.sub,
       });
 
       console.log("Job created successfully");
@@ -71,19 +73,18 @@ export default function CreateNewJob() {
 
   return (
     <main className="container">
-
       <div className="form-container">
         <h2>Submit a new job or ask a question of other students</h2>
         <form onSubmit={handleSubmit}>
           <label>
             Job Title/Question <span className="required">*Required</span>
           </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
 
           <label>
             Course or Subject <span className="required">*Required</span>
@@ -103,11 +104,20 @@ export default function CreateNewJob() {
           <label>
             Further Explanation and Description <span className="required">*Required</span>
           </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            />
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
+
+          <label>
+            Completion Date (optional)
+          </label>
+          <input
+            type="date"
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+          />
 
           <button type="submit">Submit</button>
         </form>
