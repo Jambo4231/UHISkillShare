@@ -20,10 +20,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
   const [job, setJob] = useState<Schema["Job"]["type"] | null>(null);
   const [posterName, setPosterName] = useState("Loading...");
   const [comments, setComments] = useState<
-    (Schema["Comment"]["type"] & {
-      fullName?: string;
-      averageRating?: number;
-    })[]
+    (Schema["Comment"]["type"] & { fullName?: string; averageRating?: number })[]
   >([]);
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
@@ -55,10 +52,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
           filter: { sub: { eq: job.userid } },
         });
         const user = result.data?.[0];
-        const fullName = [user?.firstname, user?.surname]
-          .filter(Boolean)
-          .join(" ")
-          .trim();
+        const fullName = [user?.firstname, user?.surname].filter(Boolean).join(" ").trim();
         setPosterName(fullName || "Unknown user");
       } catch {
         setPosterName("Unknown user");
@@ -79,26 +73,16 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
         const enrichedComments = await Promise.all(
           rawComments.map(async (comment) => {
             const [userRes, ratingRes] = await Promise.all([
-              client.models.User.list({
-                filter: { sub: { eq: comment.userid } },
-              }),
-              client.models.CommentRating.list({
-                filter: { commentid: { eq: comment.id } },
-              }),
+              client.models.User.list({ filter: { sub: { eq: comment.userid } } }),
+              client.models.CommentRating.list({ filter: { commentid: { eq: comment.id } } }),
             ]);
 
             const user = userRes.data?.[0];
-            const fullName =
-              [user?.firstname, user?.surname]
-                .filter(Boolean)
-                .join(" ")
-                .trim() || "Unknown user";
+            const fullName = [user?.firstname, user?.surname].filter(Boolean).join(" ").trim() || "Unknown user";
 
             const ratings = ratingRes.data ?? [];
             const averageRating = ratings.length
-              ? Math.round(
-                  ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
-                )
+              ? Math.round(ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length)
               : 0;
 
             return { ...comment, fullName, averageRating };
@@ -117,6 +101,14 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
   async function handleRateComment(commentId: string, rating: number) {
     try {
       const { userId } = await getCurrentUser();
+
+      const comment = comments.find((c) => c.id === commentId);
+      if (!comment) return;
+
+      if (comment.userid === userId) {
+        alert("You can't rate your own comment.");
+        return;
+      }
 
       const existing = await client.models.CommentRating.list({
         filter: {
@@ -140,7 +132,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
 
       setComments((prev) =>
         prev.map((c) =>
-          c.id === commentId ? { ...c, averageRating: rating as number } : c
+          c.id === commentId ? { ...c, averageRating: rating } : c
         )
       );
     } catch (err) {
@@ -152,9 +144,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
     if (!newComment.trim()) return;
     try {
       const { userId } = await getCurrentUser();
-      const userRes = await client.models.User.list({
-        filter: { sub: { eq: userId } },
-      });
+      const userRes = await client.models.User.list({ filter: { sub: { eq: userId } } });
       const currentUser = userRes.data?.[0];
       const timestamp = Date.now();
 
@@ -169,10 +159,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
       if (!response?.data) return;
 
       const fullName =
-        [currentUser?.firstname, currentUser?.surname]
-          .filter(Boolean)
-          .join(" ")
-          .trim() || "Unknown user";
+        [currentUser?.firstname, currentUser?.surname].filter(Boolean).join(" ").trim() || "Unknown user";
 
       setComments((prev) => [
         ...prev,
@@ -231,14 +218,12 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
       <div className="job-details">
         <h2>{job.title}</h2>
         <p className="poster">
-          Posted by: <strong>{posterName}</strong> •{" "}
-          {job.subject || "No Subject"}
+          Posted by: <strong>{posterName}</strong> • {job.subject || "No Subject"}
         </p>
         <p className="job-body">{job.description}</p>
         {job.deadline && (
           <p className="deadline">
-            <strong>Deadline:</strong>{" "}
-            {new Date(job.deadline).toLocaleDateString("en-GB")}
+            <strong>Deadline:</strong> {new Date(job.deadline).toLocaleDateString("en-GB")}
           </p>
         )}
 
@@ -259,10 +244,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
           )}
         </div>
 
-        <button
-          className="apply-button"
-          onClick={() => router.push(`/job-application/${id}`)}
-        >
+        <button className="apply-button" onClick={() => router.push(`/job-application/${id}`)}>
           Apply for Job / Share UHI Email
         </button>
 
@@ -279,16 +261,14 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
                       ? new Date(comment.commenttime).toLocaleString("en-GB")
                       : "Unknown time"}
                   </span>
+
                   <div className="stars" style={{ marginTop: "4px" }}>
                     {[1, 2, 3, 4, 5].map((star) => (
                       <span
                         key={star}
                         style={{
                           cursor: "pointer",
-                          color:
-                            star <= (comment.averageRating ?? 0)
-                              ? "#facc15"
-                              : "#d1d5db",
+                          color: star <= (comment.averageRating ?? 0) ? "#facc15" : "#d1d5db",
                           fontSize: "1.2rem",
                         }}
                         onClick={() => handleRateComment(comment.id, star)}
@@ -297,11 +277,11 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
                       </span>
                     ))}
                   </div>
+
                   <div>
-                    <button onClick={() => setReplyTo(comment.id)}>
-                      Reply
-                    </button>
+                    <button onClick={() => setReplyTo(comment.id)}>Reply</button>
                   </div>
+
                   {repliesMap[comment.id]?.length > 0 && (
                     <ul className="replies">
                       {repliesMap[comment.id].map((reply) => (
@@ -310,9 +290,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
                           <br />
                           <span className="timestamp">
                             {typeof reply.commenttime === "number"
-                              ? new Date(reply.commenttime).toLocaleString(
-                                  "en-GB"
-                                )
+                              ? new Date(reply.commenttime).toLocaleString("en-GB")
                               : "Unknown time"}
                           </span>
                         </li>

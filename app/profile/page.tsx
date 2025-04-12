@@ -21,16 +21,16 @@ export default function ProfilePage() {
   const [jobsPosted, setJobsPosted] = useState(0);
   const [jobsUndertaken, setJobsUndertaken] = useState(0);
   const [commentsCount, setCommentsCount] = useState(0);
+  const [averageUserRating, setAverageUserRating] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchUser() {
       try {
         const session = await fetchAuthSession();
-        const userId = session?.tokens?.idToken?.payload["sub"]; 
+        const userId = session?.tokens?.idToken?.payload["sub"];
 
         if (!userId) throw new Error("User ID not found in session");
 
-        // Fetch user from database by sub
         const result = await client.models.User.list({
           filter: { sub: { eq: userId } },
         });
@@ -40,15 +40,24 @@ export default function ProfilePage() {
 
         setUser(userData);
 
-        const [jobs, acceptedJobs, comments] = await Promise.all([
+        const [jobs, acceptedJobs, comments, ratings] = await Promise.all([
           client.models.Job.list({ filter: { userid: { eq: userData.sub } } }),
           client.models.AcceptedJob.list({ filter: { userid: { eq: userData.id } } }),
           client.models.Comment.list({ filter: { userid: { eq: userData.sub } } }),
+          client.models.Rating.list({ filter: { rateduserid: { eq: userData.sub } } }),
         ]);
 
         setJobsPosted(jobs.data?.length || 0);
         setJobsUndertaken(acceptedJobs.data?.length || 0);
         setCommentsCount(comments.data?.length || 0);
+
+        const ratingValues = ratings.data?.map((r) => r.rating) || [];
+        if (ratingValues.length > 0) {
+          const avg = Math.round(ratingValues.reduce((sum, r) => sum + r, 0) / ratingValues.length);
+          setAverageUserRating(avg);
+        } else {
+          setAverageUserRating(null);
+        }
       } catch (err: any) {
         console.error("Error loading user:", err);
         setError(err.message);
@@ -81,7 +90,7 @@ export default function ProfilePage() {
 
               <p>User Rating:</p>
               <div className="stars">
-                {user?.rating ? "⭐".repeat(user.rating) : "No Ratings"}
+                {averageUserRating !== null ? "⭐".repeat(averageUserRating) : "No Ratings"}
               </div>
 
               <p>Average Comment Rating:</p>
