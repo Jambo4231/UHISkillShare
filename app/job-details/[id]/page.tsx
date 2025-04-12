@@ -22,7 +22,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
   const [posterName, setPosterName] = useState("Loading...");
   const [posterSub, setPosterSub] = useState<string | null>(null);
   const [comments, setComments] = useState<
-    (Schema["Comment"]["type"] & { fullName?: string; averageRating?: number })[]
+    (Schema["Comment"]["type"] & { username?: string; averageRating?: number })[]
   >([]);
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
@@ -54,8 +54,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
           filter: { sub: { eq: job.userid } },
         });
         const user = result.data?.[0];
-        const fullName = [user?.firstname, user?.surname].filter(Boolean).join(" ").trim();
-        setPosterName(fullName || "Unknown user");
+        setPosterName(user?.username || "Unknown user");
         setPosterSub(user?.sub || null);
       } catch {
         setPosterName("Unknown user");
@@ -81,14 +80,14 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
             ]);
 
             const user = userRes.data?.[0];
-            const fullName = [user?.firstname, user?.surname].filter(Boolean).join(" ").trim() || "Unknown user";
+            const username = user?.username || "Unknown user";
 
             const ratings = ratingRes.data ?? [];
             const averageRating = ratings.length
               ? Math.round(ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length)
               : 0;
 
-            return { ...comment, fullName, averageRating };
+            return { ...comment, username, averageRating };
           })
         );
 
@@ -134,9 +133,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
       }
 
       setComments((prev) =>
-        prev.map((c) =>
-          c.id === commentId ? { ...c, averageRating: rating } : c
-        )
+        prev.map((c) => (c.id === commentId ? { ...c, averageRating: rating } : c))
       );
     } catch (err) {
       console.error("Failed to rate comment:", err);
@@ -161,15 +158,14 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
 
       if (!response?.data) return;
 
-      const fullName =
-        [currentUser?.firstname, currentUser?.surname].filter(Boolean).join(" ").trim() || "Unknown user";
+      const username = currentUser?.username || "Unknown user";
 
       setComments((prev) => [
         ...prev,
         {
           ...(response.data as Schema["Comment"]["type"]),
           commenttime: timestamp,
-          fullName,
+          username,
           averageRating: 0,
         },
       ]);
@@ -202,16 +198,13 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
   }
 
   const topLevelComments = comments.filter((c) => !c.parentid);
-  const repliesMap = comments.reduce(
-    (acc, comment) => {
-      if (comment.parentid) {
-        if (!acc[comment.parentid]) acc[comment.parentid] = [];
-        acc[comment.parentid].push(comment);
-      }
-      return acc;
-    },
-    {} as Record<string, typeof comments>
-  );
+  const repliesMap = comments.reduce((acc, comment) => {
+    if (comment.parentid) {
+      if (!acc[comment.parentid]) acc[comment.parentid] = [];
+      acc[comment.parentid].push(comment);
+    }
+    return acc;
+  }, {} as Record<string, typeof comments>);
 
   if (error) return <p className="error">{error}</p>;
   if (!job) return <p>Loading job details...</p>;
@@ -266,7 +259,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
               {topLevelComments.map((comment) => (
                 <li key={comment.id}>
                   <Link href={`/user-profile/${comment.userid}`}>
-                    <strong className="hover:underline cursor-pointer">{comment.fullName}</strong>
+                    <strong className="hover:underline cursor-pointer">{comment.username}</strong>
                   </Link>: {comment.commenttext}
                   <br />
                   <span className="timestamp">
@@ -299,7 +292,7 @@ export default function JobDetailsPage({ params }: { params: { id: string } }) {
                     <ul className="replies">
                       {repliesMap[comment.id].map((reply) => (
                         <li key={reply.id}>
-                          <strong>{reply.fullName}</strong>: {reply.commenttext}
+                          <strong>{reply.username}</strong>: {reply.commenttext}
                           <br />
                           <span className="timestamp">
                             {typeof reply.commenttime === "number"

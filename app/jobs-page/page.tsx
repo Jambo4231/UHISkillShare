@@ -16,7 +16,7 @@ const client = generateClient<Schema>();
 
 type JobWithExtras = Schema["Job"]["type"] & {
   commentCount: number;
-  posterFullName?: string;
+  posterUsername?: string;
 };
 
 const subjectOptions = [
@@ -53,9 +53,8 @@ export default function JobsPage() {
 
       const userMap = new Map<string, string>();
       users.forEach((user) => {
-        const fullName = `${user.firstname ?? ""} ${user.surname ?? ""}`.trim();
         if (user.sub) {
-          userMap.set(user.sub, fullName || "Unnamed user");
+          userMap.set(user.sub, user.username || "Unnamed user");
         }
       });
 
@@ -67,7 +66,7 @@ export default function JobsPage() {
       }, {} as Record<string, number>);
 
       const enrichedJobs = jobs.map((job) => {
-        const posterFullName =
+        const posterUsername =
           job.userid && userMap.has(job.userid)
             ? userMap.get(job.userid)
             : "Unknown user";
@@ -75,7 +74,7 @@ export default function JobsPage() {
         return {
           ...job,
           commentCount: commentCounts[job.id] || 0,
-          posterFullName,
+          posterUsername,
         };
       });
 
@@ -146,8 +145,19 @@ export default function JobsPage() {
                 <div className="job-header">
                   <h2>{job.title}</h2>
                   <p className="poster">
-                    Posted by: {job.posterFullName || "Unknown user"} • Subject:{" "}
-                    {job.subject || "N/A"}
+                    Posted by:{" "}
+                    {job.userid ? (
+                      <a
+                        href={`/user-profile/${job.userid}`}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ textDecoration: "underline", color: "#2563eb" }}
+                      >
+                        {job.posterUsername}
+                      </a>
+                    ) : (
+                      "Unknown user"
+                    )}{" "}
+                    • Subject: {job.subject || "N/A"}
                   </p>
                 </div>
                 <p className="job-body">{job.description}</p>
