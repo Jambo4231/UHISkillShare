@@ -22,13 +22,13 @@ export default function ProfilePage() {
   const [jobsUndertaken, setJobsUndertaken] = useState(0);
   const [commentsCount, setCommentsCount] = useState(0);
   const [averageUserRating, setAverageUserRating] = useState<number | null>(null);
+  const [averageCommentRating, setAverageCommentRating] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchUser() {
       try {
         const session = await fetchAuthSession();
         const userId = session?.tokens?.idToken?.payload["sub"];
-
         if (!userId) throw new Error("User ID not found in session");
 
         const result = await client.models.User.list({
@@ -37,7 +37,6 @@ export default function ProfilePage() {
 
         const userData = result.data?.[0];
         if (!userData) throw new Error("User not found in database");
-
         setUser(userData);
 
         const [jobs, acceptedJobs, comments, ratings] = await Promise.all([
@@ -51,12 +50,29 @@ export default function ProfilePage() {
         setJobsUndertaken(acceptedJobs.data?.length || 0);
         setCommentsCount(comments.data?.length || 0);
 
+        // Calculate average user rating
         const ratingValues = ratings.data?.map((r) => r.rating) || [];
         if (ratingValues.length > 0) {
           const avg = Math.round(ratingValues.reduce((sum, r) => sum + r, 0) / ratingValues.length);
           setAverageUserRating(avg);
-        } else {
-          setAverageUserRating(null);
+        }
+
+        // Calculate average comment rating
+        const commentIds = comments.data?.map((c) => c.id) || [];
+        if (commentIds.length > 0) {
+          const commentRatingsRes = await client.models.CommentRating.list({
+            filter: { commentid: { in: commentIds } },
+          });
+
+          const commentRatings = commentRatingsRes.data || [];
+          const commentRatingValues = commentRatings.map((r) => r.rating);
+
+          if (commentRatingValues.length > 0) {
+            const avgComment = Math.round(
+              commentRatingValues.reduce((sum, r) => sum + r, 0) / commentRatingValues.length
+            );
+            setAverageCommentRating(avgComment);
+          }
         }
       } catch (err: any) {
         console.error("Error loading user:", err);
@@ -95,9 +111,7 @@ export default function ProfilePage() {
 
               <p>Average Comment Rating:</p>
               <div className="stars">
-                {user?.averageCommentRating
-                  ? "⭐".repeat(user.averageCommentRating)
-                  : "No Ratings"}
+                {averageCommentRating !== null ? "⭐".repeat(averageCommentRating) : "No Ratings"}
               </div>
             </div>
           </div>
@@ -108,7 +122,7 @@ export default function ProfilePage() {
           <p>Jobs Undertaken: <span>{jobsUndertaken}</span></p>
           <p>Comments: <span>{commentsCount}</span></p>
         </div>
-        
+
         <div className="update-profile-link">
           <button onClick={() => router.push("/updateProfile")}>
             Update Profile
