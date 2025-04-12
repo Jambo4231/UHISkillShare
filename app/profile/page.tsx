@@ -60,13 +60,12 @@ export default function ProfilePage() {
         // Calculate average comment rating
         const commentIds = comments.data?.map((c) => c.id) || [];
         if (commentIds.length > 0) {
-          const commentRatingsRes = await client.models.CommentRating.list({
-            filter: { commentid: { in: commentIds } },
-          });
+          const commentRatingsRes = await client.models.CommentRating.list();
+          const commentRatings = commentRatingsRes.data?.filter((r) =>
+            commentIds.includes(r.commentid)
+          ) || [];
 
-          const commentRatings = commentRatingsRes.data || [];
           const commentRatingValues = commentRatings.map((r) => r.rating);
-
           if (commentRatingValues.length > 0) {
             const avgComment = Math.round(
               commentRatingValues.reduce((sum, r) => sum + r, 0) / commentRatingValues.length
