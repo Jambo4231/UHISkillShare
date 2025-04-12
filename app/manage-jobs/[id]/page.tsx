@@ -10,16 +10,16 @@ import type { Schema } from "@/amplify/data/resource";
 const client = generateClient<Schema>();
 
 export default function ManageJobPage({ params }: { params: { id: string } }) {
-        const id = params.id;
+  const id = params.id;
   const router = useRouter();
 
   const [userId, setUserId] = useState("");
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
-     title: "",
-        description: "",
-     subject: "",
+    title: "",
+    description: "",
+    subject: "",
     deadline: "",
   });
 
@@ -27,13 +27,14 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
     const fetchUserAndJob = async () => {
       try {
         const user = await getCurrentUser();
-        setUserId(user.userId);
+        console.log("Fetched user:", user);
+        setUserId(user.userId || user.username); // fallback in case userId is undefined
 
         const result = await client.models.Job.get({ id: id as string });
         if (result?.data) {
           setJob(result.data);
           setFormData({
-              title: result.data.title,
+            title: result.data.title,
             description: result.data.description,
             subject: result.data.subject ?? "",
             deadline: result.data.deadline ?? "",
@@ -42,45 +43,61 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
       } catch (error) {
         console.error("Error fetching job:", error);
       } finally {
-              setLoading(false);
+        setLoading(false);
       }
     };
 
     fetchUserAndJob();
   }, [id]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleUpdate = async () => {
+    if (!userId || !job) {
+      alert("User ID or job data missing. Please refresh and try again.");
+      return;
+    }
+
+    const updatePayload = {
+      id: id as string,
+      title: formData.title,
+      description: formData.description,
+      subject: formData.subject,
+      deadline: formData.deadline,
+      userid: userId,
+      status: job.status, // keep existing status
+    };
+
     try {
-      await client.models.Job.update({
-        id: id as string,
-        ...formData,
-      });
-      alert("Job has Been Updated successfully.");
+      console.log("Sending update payload:", updatePayload);
+      await client.models.Job.update(updatePayload);
+      alert("Job has been updated successfully.");
     } catch (err) {
       console.error("Update failed", err);
-      alert("Failed to Update Job.");
+      alert("Failed to update job.");
     }
   };
 
   const handleComplete = async () => {
-    const confirm = window.confirm("Mark Job as Complete?");
+    const confirm = window.confirm("Mark job as complete?");
     if (!confirm) return;
 
     try {
       await client.models.Job.update({
         id: id as string,
-        status: 2, // Assuming 2 = complete???
+        status: 2, // 2 = complete
+        userid: userId, // still required
       });
-      alert("Job Marked as Complete.");
+      alert("Job marked as complete.");
       router.push("/my-jobs");
     } catch (err) {
-      console.error("Error Marking Complete", err);
-      alert("Failed to Mark Job as Complete.");
+      console.error("Error marking complete", err);
+      alert("Failed to mark job as complete.");
     }
   };
 
@@ -99,7 +116,6 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
   };
 
   if (loading) return <p>Loading...</p>;
-
   if (!job) return <p>Job not found or you don’t have permission.</p>;
 
   return (
