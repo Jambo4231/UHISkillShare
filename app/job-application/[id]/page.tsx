@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
@@ -17,11 +18,11 @@ const client = generateClient<Schema>();
 export default function JobApplicationPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [job, setJob] = useState<Schema["Job"]["type"] | null>(null);
-  const [posterName, setPosterName] = useState("Loading...");
+  const [posterUsername, setPosterUsername] = useState("Loading...");
+  const [posterSub, setPosterSub] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [applicationMessage, setApplicationMessage] = useState("");
 
-  // Fetch Job Details
   useEffect(() => {
     async function fetchJob() {
       if (!params.id) return;
@@ -40,28 +41,24 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
     fetchJob();
   }, [params.id]);
 
-  // Fetch Full Name of Poster
   useEffect(() => {
-    async function fetchPosterName() {
+    async function fetchPoster() {
       if (!job?.userid) return;
       try {
         const result = await client.models.User.list({
           filter: { sub: { eq: job.userid } },
         });
         const user = result.data?.[0];
-        const firstname = user?.firstname ?? "";
-        const surname = user?.surname ?? "";
-        const fullName = [firstname, surname].filter(Boolean).join(" ").trim();
-        setPosterName(fullName || "Unknown user");
+        setPosterUsername(user?.username || "Unknown user");
+        setPosterSub(user?.sub || null);
       } catch (error) {
-        console.error("Error fetching poster name:", error);
-        setPosterName("Unknown user");
+        console.error("Error fetching poster username:", error);
+        setPosterUsername("Unknown user");
       }
     }
-    fetchPosterName();
+    fetchPoster();
   }, [job?.userid]);
 
-  // Handle Job Application Submission
   async function handleJobSubmit() {
     if (!job) return;
 
@@ -70,7 +67,7 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
 
       await client.models.AcceptedJob.create({
         jobid: job.id,
-        userid: sub, 
+        userid: sub,
         applytext: applicationMessage,
       });
 
@@ -90,7 +87,15 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
       <div className="job-details">
         <h2>{job.title}</h2>
         <p className="poster">
-          Posted by: <strong>{posterName}</strong> • {job.subject || "No Subject"}
+          Posted by:{" "}
+          {posterSub ? (
+            <Link href={`/user-profile/${posterSub}`}>
+              <strong className="hover:underline cursor-pointer">{posterUsername}</strong>
+            </Link>
+          ) : (
+            <strong>{posterUsername}</strong>
+          )}{" "}
+          • {job.subject || "No Subject"}
         </p>
         <p className="job-body">
           Do you wish to apply for this job? If the job poster accepts your application,
