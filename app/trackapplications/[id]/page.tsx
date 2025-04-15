@@ -55,19 +55,30 @@ export default function TrackApplicationsPage({ params }: { params: { id: string
         const acceptedApps = acceptedRes.data?.filter(Boolean) ?? [];
         const users = usersRes.data?.filter(Boolean) ?? [];
 
-        const userMap = new Map<string, string>();
+        const userMap = new Map<string, { fullName: string; email: string }>();
         users.forEach((user) => {
-          const fullName = `${user.firstname ?? ""} ${user.surname ?? ""}`.trim();
-          if (user.sub) userMap.set(user.sub, fullName || "Unnamed user");
+          const fullName = `${user.firstname ?? ""} ${user.surname ?? ""}`.trim() || "Unnamed user";
+          const email = user.email ?? "No email provided";
+          if (user.sub) {
+            userMap.set(user.sub, { fullName, email });
+          }
         });
 
-        const appList: ApplicationWithExtras[] = acceptedApps.map((app) => ({
-          id: app.id!,
-          userId: app.userid ?? "unknown",
-          fullName: userMap.get(app.userid ?? "") ?? "Unknown user",
-          applicationText: app.applytext ?? "",
-          status: app.status ?? "pending",
-        }));
+        const appList: ApplicationWithExtras[] = acceptedApps.map((app) => {
+          const userInfo = userMap.get(app.userid ?? "") ?? {
+            fullName: "Unknown user",
+            email: "Unknown email",
+          };
+
+          return {
+            id: app.id!,
+            userId: app.userid ?? "unknown",
+            fullName: userInfo.fullName,
+            email: userInfo.email,
+            applicationText: app.applytext ?? "",
+            status: app.status ?? "pending",
+          };
+        });
 
         setApplications(appList);
       } catch (err: any) {
@@ -79,22 +90,23 @@ export default function TrackApplicationsPage({ params }: { params: { id: string
     fetchData();
   }, [jobId]);
 
-  async function handleDecision(appId: string, applicantId: string, action: "accepted" | "rejected") {
+  async function handleDecision(
+    appId: string,
+    applicantId: string,
+    action: "accepted" | "rejected"
+  ) {
     try {
-      // Update status in AcceptedJob
       await client.models.AcceptedJob.update({
         id: appId,
         status: action,
       });
 
-      // Send notification
       await client.models.Notification.create({
         userid: applicantId,
         notiftitle: `Your application was ${action}`,
         notifdescription: `Your application to "${jobTitle}" was ${action}.`,
       });
 
-      // Update local UI
       setApplications((prev) =>
         prev.map((app) =>
           app.id === appId ? { ...app, status: action } : app
@@ -117,7 +129,7 @@ export default function TrackApplicationsPage({ params }: { params: { id: string
           applications.map((app, index) => (
             <div key={index} className="notif-card">
               <p>
-                <strong>{app.fullName}</strong> applied to this job.
+                <strong>{app.fullName}</strong> ({app.email}) applied to this job.
                 <br />
                 <br />
                 <em>{app.applicationText}</em>
