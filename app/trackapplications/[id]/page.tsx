@@ -16,6 +16,7 @@ type ApplicationWithExtras = {
   id: string;
   userId: string;
   fullName: string;
+  email: string;
   applicationText: string;
   status: string;
 };

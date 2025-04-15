@@ -69,7 +69,7 @@ export default function RegisterPage() {
         <h2>Create a New Account</h2>
         <form onSubmit={handleSubmit}>
           <label>
-            UHI Email <span className="required">*Required</span>
+            Email <span className="required">*Required</span>
           </label>
           <input
             type="email"
