@@ -115,7 +115,14 @@ export default function JobsPage() {
   return (
     <main className="container">
       <div className="layout">
+        <input type="checkbox" id="sidebar-active">
+		    <label for="sidebar-active" className="opensidebarbutton">
+			      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg>
+		    </label>
         <aside className="sidebar">
+          <label for="sidebar-active" className="closesidebarbutton">
+				      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+			    </label>
           <h2>Sort by Course/Subject</h2>
           <ul>
             {subjectOptions.map((subject) => (
