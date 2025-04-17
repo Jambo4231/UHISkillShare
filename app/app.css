@@ -539,15 +539,18 @@ button[type="submit"]:hover {
 }
 
 /*Hide mobile buttons on PC*/
-.opensidebarbutton, .closesidebarbutton {
+.opensidebarbutton, .closesidebarbutton, .opennavbarbutton, .closenavbarbutton  {
 	display:none;
 }
-#sidebar-active {
+#sidebar-active, #navbar-active {
 	display:none;
 }
 /*Colour of icons light mode */
 svg {
 	fill: var(--darkcolor);
+}
+#logomobile {
+	display:none;
 }
 
 /*Dark mode*/
@@ -640,13 +643,10 @@ svg {
 		fill: var(--lightcolor);
 	}
   }
-@media (max-width:800px){
-	.navbar{
-		height:3vh;
-		font-size: 1em;
-	}
+@media (max-width:1000px){
 	#logo{
 		height:3vh;
+		display:none;
 	}
 	.job-details {
 		width:95%;
@@ -659,25 +659,67 @@ svg {
 		flex-direction:column;
 		align-items: flex-start;
 		position:fixed;
-		top:3vh;
-		right;0;
+		top:5vh;
+		left:0;
 		z-index:10;
 		width: 70vw;
-		height: 97vh;
+		height: 100vh;
 	}
-	nav a {
+	.navbar {
+		display:none;
+		flex-direction:column;
+		align-items: center;
+		position:fixed;
+		top:0;
+		right:0;
+		z-index:11;
+		width: 70vw;
+		font-size: 1em;
+		border-bottom:none;
+		border-left:none;
+	}
+	/*nav a {
 		box-sizing: border-box;
 		height:auto;
 		width:100%;
 		justify-content:flex-start;
-	}
-	.opensidebarbutton, .closesidebarbutton {
+	}*/
+	.opensidebarbutton, .closesidebarbutton, .opennavbarbutton, .closenavbarbutton {
 		display:block;
 	}
 	#sidebar-active:checked ~ .sidebar{
 		display:flex;		
 	}
-}
+	#navbar-active:checked ~ .navbar{
+		display:flex;
+		border-left: 2px solid var(--darkcolor);
+	}
+	#logomobile {
+		display:block;
+		height:5vh;
+	}
+	.navbar a {
+		flex-direction:column;
+		font-size: 1em;
+		float:none;
+		width:60vw;
+		height:5vh;
+	}
+	.navbar button {
+		height:5vh;
+		width:60vw;
+	}
+	#NavbarProfile {
+		width:5vh;
+	}
+	#verticalline {
+		display:none;
+	}
+	@media (prefers-color-scheme: dark) {
+		#navbar-active:checked ~ .navbar{
+			border-left: 2px solid var(--lightcolor);
+		}
+	}
 }
 
 
