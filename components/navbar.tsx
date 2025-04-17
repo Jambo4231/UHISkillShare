@@ -20,6 +20,11 @@ const Navbar = () => {
   if (loading) return <div className="navbar-placeholder">Loading...</div>;
 
   return (
+    <a href="/jobs-page"><img src="logo.png" id='logomobile' alt='UHI Skill Share' title="UHI Skill Share"></a>
+		<input type="checkbox" id="navbar-active">
+		<label for="navbar-active" className="opennavbarbutton">
+			<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg>
+		</label>
     <nav className="navbar">
       <a href="/jobs-page">
         <img
@@ -32,6 +37,9 @@ const Navbar = () => {
       <div className="nav-links">
         {isLoggedIn ? (
           <>
+            <label for="navbar-active" className="closenavbarbutton">
+				      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+			      </label>
             <button onClick={() => router.push("/create-new-job")}>
               + New Job
             </button>
