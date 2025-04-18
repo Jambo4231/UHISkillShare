@@ -1,61 +1,129 @@
 /*Variables*/
 :root {
-	--accentcolor: #fc0;/* Hey look, it's orange sherbet!*/
-	--accentcolorhover: #eb0;
-	--lightcolor: #fff;/*For text in dark mode*/
-	--darkcolor: #000;/*For text in light mode*/
-	--backgroundlight: #fff;/*Background Color in light mode*/
-	--backgrounddark: #181825;/*Background color in dark mode*/
-	--offlight: #fafafa;/*Background for elements that stand out from page light mode*/
-	--offdark: #252533;/*Background for elements that stand out from page dark mode*/
-	--applybuttoncolor: #0072ce; /*Up here for safekeeping*/
-	--applybuttonhover: #005fa3;
+  --accentcolor: #fc0; /* Hey look, it's orange sherbet!*/
+  --accentcolorhover: #eb0;
+  --lightcolor: #fff; /*For text in dark mode*/
+  --darkcolor: #000; /*For text in light mode*/
+  --backgroundlight: #fff; /*Background Color in light mode*/
+  --backgrounddark: #181825; /*Background color in dark mode*/
+  --offlight: #fafafa; /*Background for elements that stand out from page light mode*/
+  --offdark: #252533; /*Background for elements that stand out from page dark mode*/
+  --applybuttoncolor: #0072ce; /*Up here for safekeeping*/
+  --applybuttonhover: #005fa3;
 }
 /*Removes number of default css added by browsers*/
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
 }
 /* General Styling */
 body {
   margin: 0;
   background-color: var(--backgroundlight);
-  color:var(--darkcolor);
-  font-family: "Nunito Sans", sans-serif; 
-  font-weight:400;
+  color: var(--darkcolor);
+  font-family: "Nunito Sans", sans-serif;
+  font-weight: 400;
   height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;
 }
 strong {
-	font-weight: 800;
+  font-weight: 800;
 }
 /*For any unclassified buttons. Which should, hopefully, be none.*/
 button {
-	background-color: var(--accentcolor);
-	border: 0;
-	padding: 10px;
-	margin-top: 1.4vh;
+  background-color: var(--accentcolor);
+  border: 0;
+  padding: 10px;
+  margin-top: 1.4vh;
 }
 button:hover {
-	background-color: var(--accentcolorhover);
+  background-color: var(--accentcolorhover);
 }
 
 /* NAVBAR */
@@ -66,43 +134,44 @@ button:hover {
   align-items: center;
   padding: 0px;
   background-color: #fff;
-  color:var(--darkcolor);
+  color: var(--darkcolor);
   /*height:7vh;*/
-  box-shadow:0px 5px 5px #555;
+  box-shadow: 0px 5px 5px #555;
   border-bottom: 2px solid var(--darkcolor);
 }
 
 .nav-links a {
-	color:var(--darkcolor);
-	text-decoration:none;
-	font-size:1.5em;
-	font-weight:600;
-	border-left: 4px solid var(--darkcolor);
-	padding:5px;
-	margin:5px;
-	padding-left: 2vw;
-	float:left;
-	display:flex;
-	gap:16px;
+  color: var(--darkcolor);
+  text-decoration: none;
+  font-size: 1.5em;
+  font-weight: 600;
+  border-left: 4px solid var(--darkcolor);
+  padding: 5px;
+  margin: 5px;
+  padding-left: 2vw;
+  float: left;
+  display: flex;
+  gap: 16px;
 }
 .nav-links a:hover {
-	color: var(--offdark);
-	/*background-color: #ccc;
+  color: var(--offdark);
+  /*background-color: #ccc;
 	box-shadow:10px 10px 10px white inset, -10px -10px 10px white inset;*/
 }
 
-#logo, .logo {
-	height:7vh;
-	border-left:none;
-	margin:0px;
-	padding:0px;
+#logo,
+.logo {
+  height: 7vh;
+  border-left: none;
+  margin: 0px;
+  padding: 0px;
 }
 
 #NavbarProfile {
-	height:4vh;
-	border-left:none;
-	margin:0px;
-	padding:0px;
+  height: 4vh;
+  border-left: none;
+  margin: 0px;
+  padding: 0px;
 }
 
 .nav-links {
@@ -117,32 +186,32 @@ button:hover {
 }
 */
 .nav-links button {
-  margin-right:2vw;
-  margin-left:2vw;
+  margin-right: 2vw;
+  margin-left: 2vw;
   border: 0;
-  font-size:1.5em;
-  font-weight:600;
+  font-size: 1.5em;
+  font-weight: 600;
   background-color: var(--accentcolor);
   margin-top: 1.4vh;
   height: 60%;
-  padding:3px;
+  padding: 3px;
   color: var(--darkcolor);
 }
 .nav-links button:hover {
-	background-color: var(--accentcolorhover);
+  background-color: var(--accentcolorhover);
 }
 
-#verticalline{
-	text-decoration:none;
-	font-size:1.5em;
-	font-weight:600;
-	border-left: 4px solid var(--darkcolor);
-	padding:0px;
-	margin:5px;
-	padding-left:0px;
-	float:left;
-	display:flex;
-	gap:0px;
+#verticalline {
+  text-decoration: none;
+  font-size: 1.5em;
+  font-weight: 600;
+  border-left: 4px solid var(--darkcolor);
+  padding: 0px;
+  margin: 5px;
+  padding-left: 0px;
+  float: left;
+  display: flex;
+  gap: 0px;
 }
 
 /* LAYOUT */
@@ -164,10 +233,10 @@ button:hover {
   margin-bottom: 12px;
 }
 .sidebar label {
-	border-bottom: 0;
+  border-bottom: 0;
 }
 .sidebar ul {
-	list-style-type: none;
+  list-style-type: none;
 }
 
 /* JOB LISTING */
@@ -193,10 +262,10 @@ button:hover {
   border-radius: 8px;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);*/
 }
-.job-card h3{
-	font-weight: 800;
-	font-size: 1.2em;
-	border-bottom: 2px solid var(--darkcolor);
+.job-card h3 {
+  font-weight: 800;
+  font-size: 1.2em;
+  border-bottom: 2px solid var(--darkcolor);
 }
 
 .job-header {
@@ -210,7 +279,7 @@ button:hover {
 
 .job-body {
   font-size: 1em;
-  font-weight:400;
+  font-weight: 400;
   color: var(--darkcolor);
 }
 
@@ -245,20 +314,20 @@ button:hover {
   font-size: 0.8em;
   color: var(--offdark);
   border-top: 2px solid var(--darkcolor);
-  margin-top:3vh;
-  padding:5px;
+  margin-top: 3vh;
+  padding: 5px;
 }
 .comments ul {
-	 list-style-type: none;
+  list-style-type: none;
 }
 .comments ul li {
-	margin-top: 1vh;
-	background-color: var(--offlight);
-	padding: 5px;
-	border-top: 2px solid var(--darkcolor);
+  margin-top: 1vh;
+  background-color: var(--offlight);
+  padding: 5px;
+  border-top: 2px solid var(--darkcolor);
 }
 .comments strong {
-	font-weight: 800;
+  font-weight: 800;
 }
 
 /* FORM STYLING FOR CREATE JOB PAGE */
@@ -272,14 +341,16 @@ button:hover {
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);*/
 }
 .form-container label {
-	font-weight: 800;
-	font-size: 1em;
+  font-weight: 800;
+  font-size: 1em;
 }
-.form-container input, .form-container select, .form-container textarea{
-	background-color: var(--offlight);
-	border: 1px solid var(--darkcolor);
-	font-weight: 400;
-	font-size: 1em;
+.form-container input,
+.form-container select,
+.form-container textarea {
+  background-color: var(--offlight);
+  border: 1px solid var(--darkcolor);
+  font-weight: 400;
+  font-size: 1em;
 }
 
 h2 {
@@ -303,7 +374,8 @@ label {
   margin-left: 5px;
 }
 
-input, textarea {
+input,
+textarea {
   width: 100%;
   padding: 10px;
   margin-top: 5px;
@@ -369,7 +441,8 @@ button[type="submit"]:hover {
   font-weight: 600;
 }
 
-.user-name, .stats {
+.user-name,
+.stats {
   background: var(--offlight);
   padding: 8px;
   color: var(--darkcolor);
@@ -393,25 +466,24 @@ button[type="submit"]:hover {
 }
 
 .update-profile-link {
-  margin-top: 1.5rem; 
+  margin-top: 1.5rem;
   text-align: center;
 }
 
 .update-profile-link button {
-  background-color: #facc15; 
-  color: #1f2937; 
-  padding: 0.5rem 1rem; 
+  background-color: #facc15;
+  color: #1f2937;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 0.375rem; 
+  border-radius: 0.375rem;
   cursor: pointer;
   font-weight: 500;
   transition: background-color 0.3s ease;
 }
 
 .update-profile-link button:hover {
-  background-color: #eab308; 
+  background-color: #eab308;
 }
-
 
 .job-details {
   max-width: 60vw;
@@ -431,14 +503,14 @@ button[type="submit"]:hover {
 }
 
 .poster {
-	color: var(--backgrounddark);
-	font-weight: 200;
+  color: var(--backgrounddark);
+  font-weight: 200;
 }
 
 /*For making comments. Not existing ones*/
 .comment-section {
-	border-top: 2px solid var(--darkcolor);
-	margin-top: 2vh;
+  border-top: 2px solid var(--darkcolor);
+  margin-top: 2vh;
 }
 .comment-section textarea {
   width: 100%;
@@ -460,11 +532,11 @@ button[type="submit"]:hover {
   cursor: pointer;
 }
 .comment-section button:hover {
-	background-color: var(--accentcolorhover);
+  background-color: var(--accentcolorhover);
 }
 
 .comment-section h3 {
-	margin-top: 1vh;
+  margin-top: 1vh;
 }
 
 .apply-button {
@@ -522,205 +594,213 @@ button[type="submit"]:hover {
 }*/
 
 .content {
-	width: 60vw;
-	margin: 40px auto;
-	padding: 20px;
+  width: 60vw;
+  margin: 40px auto;
+  padding: 20px;
 }
 
 .logout-button {
-	background-color: #fff !important;
-	color: var(--darkcolor);
-	font-size:1.5em !important;
-	font-weight:600 !important;
-	border: none;
-    	padding: 8px 12px;
-    	font-weight: bold;
-    	cursor: pointer;
+  background-color: #fff !important;
+  color: var(--darkcolor);
+  font-size: 1.5em !important;
+  font-weight: 600 !important;
+  border: none;
+  padding: 8px 12px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 /*Hide mobile buttons on PC*/
-.opensidebarbutton, .closesidebarbutton, .opennavbarbutton, .closenavbarbutton  {
-	display:none;
+.opensidebarbutton,
+.closesidebarbutton,
+.opennavbarbutton,
+.closenavbarbutton {
+  display: none;
 }
-#sidebar-active, #navbar-active {
-	display:none;
+#sidebar-active,
+#navbar-active {
+  display: none;
 }
 /*Colour of icons light mode */
 svg {
-	fill: var(--darkcolor);
+  fill: var(--darkcolor);
 }
 #logomobile {
-	display:none;
+  display: none;
 }
 
 /*Dark mode*/
 @media (prefers-color-scheme: dark) {
-	body {
-		background-color: var(--backgrounddark);
-		color:var(--lightcolor);
-	}
-	h2 {
-		border-bottom: 2px solid var(--lightcolor);
-	}
-	label {
-		margin-top: 20px;
-		border-bottom: 2px solid var(--lightcolor);
-	}
-	.navbar {
-		background-color: #000;
-		color:var(--lightcolor);
-		border-bottom: 2px solid var(--lightcolor);
-	}
-	.nav-links a {
-		color: var(--lightcolor);
-		border-left: 4px solid var(--lightcolor);
-	}
-	.nav-links a:hover {
-		color: var(--offlight);
-	}
-	#verticalline {
-			border-left: 4px solid var(--lightcolor);
-	}
-	.job-details {
-		background-color: var(--backgrounddark);
-		color: var(--lightcolor);
-	}
-	.job-details h2 {
-		border-bottom: 2px solid var(--lightcolor);
-	}
-	.poster {
-		color: var(--backgroundlight);
-	}
-	.job-body {
-		color: var(--lightcolor);
-	}
-	.comment-section {
-		border-top: 2px solid var(--lightcolor);
-	}
-	.comment-section textarea {
-		background-color: var(--offdark);
-		color: var(--lightcolor);
-	}
-	.comments {
-		border-top: 2px solid var(--lightcolor);
-		color: var(--offwhite);
-	}
-	.comments ul li {
-		background-color: var(--offdark);
-		border-top: 2px solid var(--lightcolor);
-	}
-	.form-container input, .form-container select, .form-container textarea{
-		background-color: var(--offdark);
-		border: 1px solid var(--lightcolor);
-		color: var(--lightcolor);
-	}
-	.form-container {
-		background-color: var(--background-dark);
-		color: var(--lightcolor);
-	}
-	.job-card {
-		background: var(--offdark);
-	}
-	.sidebar {
-		background: var(--offdark);
-		border-right: 2px solid var(--lightcolor);
-	}
-	.job-card h3{
-		border-bottom: 2px solid var(--lightcolor);
-	}
-	.notif-card {
-		background-color: var(--offdark);
-		color: var(--lightcolor);
-	}
-	.user-name, .stats {
-		background: var(--offdark);
-		color: var(--lightcolor);
-	}
-	.logout-button {
-    		background-color: #000;   
-    		color: var(--lightcolor);
-	svg {
-		fill: var(--lightcolor);
-	}
+  body {
+    background-color: var(--backgrounddark);
+    color: var(--lightcolor);
   }
-@media (max-width:1000px){
-	#logo{
-		height:3vh;
-		display:none;
-	}
-	.job-details {
-		width:95%;
-	}
-	/*.sidebar {
+  h2 {
+    border-bottom: 2px solid var(--lightcolor);
+  }
+  label {
+    margin-top: 20px;
+    border-bottom: 2px solid var(--lightcolor);
+  }
+  .navbar {
+    background-color: #000;
+    color: var(--lightcolor);
+    border-bottom: 2px solid var(--lightcolor);
+  }
+  .nav-links a {
+    color: var(--lightcolor);
+    border-left: 4px solid var(--lightcolor);
+  }
+  .nav-links a:hover {
+    color: var(--offlight);
+  }
+  #verticalline {
+    border-left: 4px solid var(--lightcolor);
+  }
+  .job-details {
+    background-color: var(--backgrounddark);
+    color: var(--lightcolor);
+  }
+  .job-details h2 {
+    border-bottom: 2px solid var(--lightcolor);
+  }
+  .poster {
+    color: var(--backgroundlight);
+  }
+  .job-body {
+    color: var(--lightcolor);
+  }
+  .comment-section {
+    border-top: 2px solid var(--lightcolor);
+  }
+  .comment-section textarea {
+    background-color: var(--offdark);
+    color: var(--lightcolor);
+  }
+  .comments {
+    border-top: 2px solid var(--lightcolor);
+    color: var(--offwhite);
+  }
+  .comments ul li {
+    background-color: var(--offdark);
+    border-top: 2px solid var(--lightcolor);
+  }
+  .form-container input,
+  .form-container select,
+  .form-container textarea {
+    background-color: var(--offdark);
+    border: 1px solid var(--lightcolor);
+    color: var(--lightcolor);
+  }
+  .form-container {
+    background-color: var(--background-dark);
+    color: var(--lightcolor);
+  }
+  .job-card {
+    background: var(--offdark);
+  }
+  .sidebar {
+    background: var(--offdark);
+    border-right: 2px solid var(--lightcolor);
+  }
+  .job-card h3 {
+    border-bottom: 2px solid var(--lightcolor);
+  }
+  .notif-card {
+    background-color: var(--offdark);
+    color: var(--lightcolor);
+  }
+  .user-name,
+  .stats {
+    background: var(--offdark);
+    color: var(--lightcolor);
+  }
+  .logout-button {
+    background-color: #000;
+    color: var(--lightcolor);
+    svg {
+      fill: var(--lightcolor);
+    }
+  }
+  @media (max-width: 1000px) {
+    #logo {
+      height: 3vh;
+      display: none;
+    }
+    .job-details {
+      width: 95%;
+    }
+    /*.sidebar {
 		width:0%;
 	}*/
-	.sidebar{
-		display:none;
-		flex-direction:column;
-		align-items: flex-start;
-		position:fixed;
-		top:5vh;
-		left:0;
-		z-index:10;
-		width: 70vw;
-		height: 100vh;
-	}
-	.navbar {
-		display:none;
-		flex-direction:column;
-		align-items: center;
-		position:fixed;
-		top:0;
-		right:0;
-		z-index:11;
-		width: 70vw;
-		font-size: 1em;
-		border-bottom:none;
-		border-left:none;
-	}
-	/*nav a {
+    .sidebar {
+      display: none;
+      flex-direction: column;
+      align-items: flex-start;
+      position: fixed;
+      top: 5vh;
+      left: 0;
+      z-index: 10;
+      width: 70vw;
+      height: 100vh;
+    }
+    .navbar {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 11;
+      width: 70vw;
+      font-size: 1em;
+      border-bottom: none;
+      border-left: none;
+    }
+    /*nav a {
 		box-sizing: border-box;
 		height:auto;
 		width:100%;
 		justify-content:flex-start;
 	}*/
-	.opensidebarbutton, .closesidebarbutton, .opennavbarbutton, .closenavbarbutton {
-		display:block;
-	}
-	#sidebar-active:checked ~ .sidebar{
-		display:flex;		
-	}
-	#navbar-active:checked ~ .navbar{
-		display:flex;
-		border-left: 2px solid var(--darkcolor);
-	}
-	#logomobile {
-		display:block;
-		height:5vh;
-	}
-	.navbar a {
-		flex-direction:column;
-		font-size: 1em;
-		float:none;
-		width:60vw;
-		height:5vh;
-	}
-	.navbar button {
-		height:5vh;
-		width:60vw;
-	}
-	#NavbarProfile {
-		width:5vh;
-	}
-	#verticalline {
-		display:none;
-	}
-	@media (prefers-color-scheme: dark) {
-		#navbar-active:checked ~ .navbar{
-			border-left: 2px solid var(--lightcolor);
-		}
-	}
+    .opensidebarbutton,
+    .closesidebarbutton,
+    .opennavbarbutton,
+    .closenavbarbutton {
+      display: block;
+    }
+    #sidebar-active:checked ~ .sidebar {
+      display: flex;
+    }
+    #navbar-active:checked ~ .navbar {
+      display: flex;
+      border-left: 2px solid var(--darkcolor);
+    }
+    #logomobile {
+      display: block;
+      height: 5vh;
+    }
+    .navbar a {
+      flex-direction: column;
+      font-size: 1em;
+      float: none;
+      width: 60vw;
+      height: 5vh;
+    }
+    .navbar button {
+      height: 5vh;
+      width: 60vw;
+    }
+    #NavbarProfile {
+      width: 5vh;
+    }
+    #verticalline {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      #navbar-active:checked ~ .navbar {
+        border-left: 2px solid var(--lightcolor);
+      }
+    }
+  }
 }
-
-
-
