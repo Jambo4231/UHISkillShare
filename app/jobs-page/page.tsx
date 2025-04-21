@@ -30,6 +30,11 @@ const subjectOptions = [
   "Mobile applications development",
 ];
 
+// Truncate helper
+function truncate(text: string, maxLength: number) {
+  return text.length > maxLength ? text.slice(0, maxLength) + "…" : text;
+}
+
 export default function JobsPage() {
   const [jobs, setJobs] = useState<JobWithExtras[]>([]);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
@@ -173,7 +178,7 @@ export default function JobsPage() {
                     • Subject: {job.subject || "N/A"}
                   </p>
                 </div>
-                <p className="job-body">{job.description}</p>
+                <p className="job-body">{truncate(job.description || "", 100)}</p>
                 <div className="job-footer">
                   <span className={`status ${job.status === 1 ? "open" : "closed"}`}>
                     {job.status === 1 ? "Unresolved" : "Resolved"}

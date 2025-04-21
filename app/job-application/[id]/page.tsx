@@ -22,6 +22,8 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
   const [posterSub, setPosterSub] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [applicationMessage, setApplicationMessage] = useState("");
+  const [hasApplied, setHasApplied] = useState(false);
+  const [isOwnJob, setIsOwnJob] = useState(false);
 
   useEffect(() => {
     async function fetchJob() {
@@ -59,11 +61,60 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
     fetchPoster();
   }, [job?.userid]);
 
+  useEffect(() => {
+    async function checkIfOwnOrAlreadyApplied() {
+      if (!job) return;
+      try {
+        const { userId: sub } = await getCurrentUser();
+
+        // Check if applying to own job
+        if (job.userid === sub) {
+          setIsOwnJob(true);
+          return;
+        }
+
+        // Check for existing application
+        const existing = await client.models.AcceptedJob.list({
+          filter: {
+            jobid: { eq: job.id },
+            userid: { eq: sub },
+          },
+        });
+
+        if (existing.data.length > 0) {
+          setHasApplied(true);
+        }
+      } catch (error) {
+        console.error("Error checking for application or ownership:", error);
+      }
+    }
+    checkIfOwnOrAlreadyApplied();
+  }, [job]);
+
   async function handleJobSubmit() {
     if (!job) return;
 
     try {
       const { userId: sub } = await getCurrentUser();
+
+      // Check again before submitting just in case
+      if (job.userid === sub) {
+        alert("You cannot apply to your own job.");
+        return;
+      }
+
+      const existing = await client.models.AcceptedJob.list({
+        filter: {
+          jobid: { eq: job.id },
+          userid: { eq: sub },
+        },
+      });
+
+      if (existing.data.length > 0) {
+        alert("You have already applied for this job.");
+        setHasApplied(true);
+        return;
+      }
 
       await client.models.AcceptedJob.create({
         jobid: job.id,
@@ -73,6 +124,7 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
 
       alert("Your application has been submitted successfully!");
       setApplicationMessage("");
+      setHasApplied(true);
     } catch (error) {
       console.error("Error submitting application:", error);
       alert("Failed to submit application.");
@@ -109,12 +161,20 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
             information or explanation here so that the job poster can see why your
             application is relevant to their issue.
           </h3>
-          <textarea
-            placeholder="Write your application"
-            value={applicationMessage}
-            onChange={(e) => setApplicationMessage(e.target.value)}
-          ></textarea>
-          <button onClick={handleJobSubmit}>Submit</button>
+          {isOwnJob ? (
+            <p className="info-message">You cannot apply to your own job.</p>
+          ) : hasApplied ? (
+            <p className="info-message">You have already applied for this job.</p>
+          ) : (
+            <>
+              <textarea
+                placeholder="Write your application"
+                value={applicationMessage}
+                onChange={(e) => setApplicationMessage(e.target.value)}
+              ></textarea>
+              <button onClick={handleJobSubmit}>Submit</button>
+            </>
+          )}
         </div>
       </div>
     </main>
