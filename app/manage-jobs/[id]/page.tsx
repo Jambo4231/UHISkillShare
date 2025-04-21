@@ -9,6 +9,17 @@ import type { Schema } from "@/amplify/data/resource";
 
 const client = generateClient<Schema>();
 
+const subjectOptions = [
+  "Advanced databases",
+  "Designing web-based applications",
+  "Cyber security",
+  "Server technologies",
+  "Network and information security",
+  "Artificial intelligence",
+  "Software construction",
+  "Mobile applications development",
+];
+
 export default function ManageJobPage({ params }: { params: { id: string } }) {
   const id = params.id;
   const router = useRouter();
@@ -23,11 +34,16 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
     deadline: "",
   });
 
+  const [errors, setErrors] = useState({
+    title: false,
+    description: false,
+    subject: false,
+  });
+
   useEffect(() => {
     const fetchUserAndJob = async () => {
       try {
         const user = await getCurrentUser();
-        console.log("Fetched user:", user);
         setUserId(user.userId || user.username);
 
         const result = await client.models.Job.get({ id: id as string });
@@ -51,15 +67,33 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
   }, [id]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Reset error if the field is being edited
+    if (errors[name as keyof typeof errors]) {
+      setErrors((prev) => ({ ...prev, [name]: false }));
+    }
   };
 
   const handleUpdate = async () => {
     if (!userId || !job) {
       alert("User ID or job data missing. Please refresh and try again.");
+      return;
+    }
+
+    // Validation
+    const newErrors = {
+      title: !formData.title.trim(),
+      description: !formData.description.trim(),
+      subject: !formData.subject,
+    };
+
+    setErrors(newErrors);
+
+    if (newErrors.title || newErrors.description || newErrors.subject) {
       return;
     }
 
@@ -74,10 +108,9 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
     };
 
     try {
-      console.log("Sending update payload:", updatePayload);
       await client.models.Job.update(updatePayload);
       alert("Job has been updated successfully.");
-      router.push("/my-jobs"); 
+      router.push("/my-jobs");
     } catch (err) {
       console.error("Update failed", err);
       alert("Failed to update job.");
@@ -122,32 +155,48 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
   return (
     <div className="container">
       <h2>Edit Job</h2>
+
       <input
         type="text"
         name="title"
         value={formData.title}
         onChange={handleInputChange}
         placeholder="Job Title"
+        className={errors.title ? "input-error" : ""}
       />
+      {errors.title && <p className="error-text">Title is required.</p>}
+
       <textarea
         name="description"
         value={formData.description}
         onChange={handleInputChange}
         placeholder="Job Description"
+        className={errors.description ? "input-error" : ""}
       />
-      <input
-        type="text"
+      {errors.description && <p className="error-text">Description is required.</p>}
+
+      <select
         name="subject"
         value={formData.subject}
         onChange={handleInputChange}
-        placeholder="Subject"
-      />
+        className={errors.subject ? "input-error" : ""}
+      >
+        <option value="">-- Select a Subject --</option>
+        {subjectOptions.map((subject) => (
+          <option key={subject} value={subject}>
+            {subject}
+          </option>
+        ))}
+      </select>
+      {errors.subject && <p className="error-text">Please select a subject.</p>}
+
       <input
         type="date"
         name="deadline"
         value={formData.deadline}
         onChange={handleInputChange}
       />
+
       <div className="actions">
         <button onClick={handleUpdate}>Save Changes</button>
         <button onClick={handleComplete}>Mark as Complete</button>
@@ -155,6 +204,23 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
           Delete Job
         </button>
       </div>
+
+      <style jsx>{`
+        .input-error {
+          border: 2px solid red;
+        }
+
+        .error-text {
+          color: red;
+          font-size: 0.875rem;
+          margin-bottom: 0.5rem;
+        }
+
+        select.input-error {
+          background-color: #2b2b2b;
+          color: white;
+        }
+      `}</style>
     </div>
   );
 }
