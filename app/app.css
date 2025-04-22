@@ -738,21 +738,17 @@ svg {
       flex-direction: column;
       align-items: flex-start;
       position: fixed;
-      top: 5vh;
+      top: 30vh;
       left: 0;
       z-index: 10;
       width: 70vw;
       height: 100vh;
     }
     .navbar {
-      display: none;
+      display: block;
       flex-direction: column;
       align-items: center;
-      position: fixed;
-      top: 0;
-      right: 0;
-      z-index: 11;
-      width: 70vw;
+      width: 100vw;
       font-size: 1em;
       border-bottom: none;
       border-left: none;
@@ -764,9 +760,7 @@ svg {
 		justify-content:flex-start;
 	}*/
     .opensidebarbutton,
-    .closesidebarbutton,
-    .opennavbarbutton,
-    .closenavbarbutton {
+    .closesidebarbutton,{
       display: block;
     }
     #sidebar-active:checked ~ .sidebar {
@@ -784,7 +778,6 @@ svg {
       flex-direction: column;
       font-size: 1em;
       float: none;
-      width: 60vw;
       height: 5vh;
     }
     .navbar button {
