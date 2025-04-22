@@ -118,92 +118,118 @@ export default function JobsPage() {
   });
 
   return (
-    <main className="container">
-      <div className="layout">
-        <input type="checkbox" id="sidebar-active" />
-        <label htmlFor="sidebar-active" className="opensidebarbutton">
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
-            <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" />
-          </svg>
-        </label>
+    <>
+      {!currentUserSub && (
+        <div
+          className="welcome-message"
+          style={{
+            textAlign: "center",
+            padding: "1rem",
+            backgroundColor: "#f3f4f6",
+            borderBottom: "1px solid #e5e7eb",
+          }}
+        >
+          <p>Welcome! Are you new here?</p>
+          <p>
+            <a href="/register" style={{ color: "#2563eb", textDecoration: "underline", marginRight: "1rem" }}>
+              Register
+            </a>
+            or
+            <a href="/login" style={{ color: "#2563eb", textDecoration: "underline", marginLeft: "1rem" }}>
+              Login
+            </a>
+            to get started.
+          </p>
+        </div>
+      )}
 
-        <aside className="sidebar">
-          <label htmlFor="sidebar-active" className="closesidebarbutton">
+      <main className="container">
+        <div className="layout">
+          <input type="checkbox" id="sidebar-active" />
+          <label htmlFor="sidebar-active" className="opensidebarbutton">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
-              <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+              <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" />
             </svg>
           </label>
 
-          <h2>Sort by Course/Subject</h2>
-          <ul>
-            {subjectOptions.map((subject) => (
-              <li key={subject}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={selectedSubjects.includes(subject)}
-                    onChange={() => handleSubjectToggle(subject)}
-                  />
-                  {subject}
-                </label>
-              </li>
-            ))}
-          </ul>
-        </aside>
+          <aside className="sidebar">
+            <label htmlFor="sidebar-active" className="closesidebarbutton">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+              </svg>
+            </label>
 
-        <section className="jobs-list-container">
-          <div className="jobs-list">
-            {filteredJobs.map((job) => (
-              <div
-                key={job.id}
-                className="job-card"
-                onClick={() => router.push(`/job-details/${job.id}`)}
-                style={{ cursor: "pointer" }}
-              >
-                <div className="job-header">
-                  <h2>{job.title}</h2>
-                  <p className="poster">
-                    Posted by:{" "}
-                    {job.userid ? (
-                      <a
-                        href={`/user-profile/${job.userid}`}
-                        onClick={(e) => e.stopPropagation()}
-                        style={{ textDecoration: "underline", color: "#2563eb" }}
+            <h2>Sort by Course/Subject</h2>
+            <ul>
+              {subjectOptions.map((subject) => (
+                <li key={subject}>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={selectedSubjects.includes(subject)}
+                      onChange={() => handleSubjectToggle(subject)}
+                    />
+                    {subject}
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </aside>
+
+          <section className="jobs-list-container">
+            <div className="jobs-list">
+              {filteredJobs.map((job) => (
+                <div
+                  key={job.id}
+                  className="job-card"
+                  onClick={() => router.push(`/job-details/${job.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <div className="job-header">
+                    <h2>{job.title}</h2>
+                    <p className="poster">
+                      Posted by:{" "}
+                      {job.userid ? (
+                        <a
+                          href={`/user-profile/${job.userid}`}
+                          onClick={(e) => e.stopPropagation()}
+                          style={{ textDecoration: "underline", color: "#2563eb" }}
+                        >
+                          {job.posterUsername}
+                        </a>
+                      ) : (
+                        "Unknown user"
+                      )}{" "}
+                      • Subject: {job.subject || "N/A"}
+                    </p>
+                  </div>
+                  <p className="job-body">{truncate(job.description || "", 100)}</p>
+                  <div className="job-footer">
+                    <span className={`status ${job.status === 1 ? "open" : "closed"}`}>
+                      {job.status === 1 ? "Unresolved" : "Resolved"}
+                    </span>
+                    {job.status === 1 && job.userid !== currentUserSub && (
+                      <button
+                        className="apply-button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          router.push(`/job-application/${job.id}`);
+                        }}
                       >
-                        {job.posterUsername}
-                      </a>
-                    ) : (
-                      "Unknown user"
-                    )}{" "}
-                    • Subject: {job.subject || "N/A"}
-                  </p>
+                        Apply Now
+                      </button>
+                    )}
+                    <p className="comments">
+                      {job.commentCount} Comment
+                      {job.commentCount !== 1 ? "s" : ""}
+                    </p>
+                  </div>
                 </div>
-                <p className="job-body">{truncate(job.description || "", 100)}</p>
-                <div className="job-footer">
-                  <span className={`status ${job.status === 1 ? "open" : "closed"}`}>
-                    {job.status === 1 ? "Unresolved" : "Resolved"}
-                  </span>
-                  {job.status === 1 && job.userid !== currentUserSub && (
-                    <button
-                      className="apply-button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        router.push(`/job-application/${job.id}`);
-                      }}
-                    >
-                      Apply Now
-                    </button>
-                  )}
-                  <p className="comments">
-                    {job.commentCount} Comment
-                    {job.commentCount !== 1 ? "s" : ""}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-    </main>
+              ))}
+            </div>
+          </section>
+        </div>
+      </main>
+    </>
   );
 }
