@@ -7,12 +7,14 @@ import outputs from "../../amplify_outputs.json";
 Amplify.configure(outputs);
 
 import { useState } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter
 import "../app.css";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter(); // Initialise useRouter
 
   async function handleForgotPassword(e: React.FormEvent) {
     e.preventDefault();
@@ -21,7 +23,8 @@ export default function ForgotPasswordPage() {
 
     try {
       await resetPassword({ username: email });
-      setMessage("Password reset email sent. Check your inbox.");
+      setMessage("Password reset email sent. Redirecting...");
+      router.push(`/confirm-reset?email=${encodeURIComponent(email)}`);
     } catch (err: any) {
       console.error("Forgot password error:", err);
       setError(err.message || "Something went wrong");
