@@ -33,6 +33,9 @@
           "deploymentBucketName": "amplify-teamproject-main-0a867-deployment",
           "s3Key": "amplify-builds/S3Triggera800f72f-5753486a72616d43394e-build.zip"
         }
+      },
+      "storage": {
+        "profilePicture": {}
       }
     }
   }

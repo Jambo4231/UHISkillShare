@@ -1,0 +1,14 @@
+{
+  "resourceName": "profilePicture",
+  "policyUUID": "b17edbd5",
+  "bucketName": "uhiskillshare-profile-pictures-jamie",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}
