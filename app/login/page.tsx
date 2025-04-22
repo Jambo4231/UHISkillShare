@@ -4,11 +4,7 @@ import { Amplify } from "aws-amplify";
 import outputs from "../../amplify_outputs.json";
 Amplify.configure(outputs);
 
-import {
-  signIn,
-  getCurrentUser,
-  fetchAuthSession
-} from "aws-amplify/auth";
+import { signIn, getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
 
@@ -17,7 +13,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import "../app.css";
 
-// ✅ Auth mode set globally for the client
 const client = generateClient<Schema>({
   authMode: "userPool",
 });
@@ -55,8 +50,8 @@ export default function LoginPage() {
       if (result.data.length === 0) {
         // 🆕 Step 5: Add user with sub
         await client.models.User.create({
-          sub,              // ✅ Required by schema
-          username: sub,    // Use sub as a default username
+          sub, // ✅ Required by schema
+          username: sub, // Use sub as a default username
           email,
           firstname: "",
           surname: "",
@@ -103,10 +98,23 @@ export default function LoginPage() {
 
         {error && <p style={{ color: "red" }}>{error}</p>}
 
-        {/* 👇 Register Link Below Login Button */}
+        {/* Forgot Password Link */}
+        <p style={{ marginTop: "1rem" }}>
+          <Link
+            href="/forgot-password"
+            style={{ color: "#007bff", textDecoration: "underline" }}
+          >
+            Forgot your password?
+          </Link>
+        </p>
+
+        {/* Register Link */}
         <p style={{ marginTop: "1rem" }}>
           Don&apos;t have an account?{" "}
-          <Link href="/register" style={{ color: "#ffc107", textDecoration: "underline" }}>
+          <Link
+            href="/register"
+            style={{ color: "#ffc107", textDecoration: "underline" }}
+          >
             Register here.
           </Link>
         </p>
