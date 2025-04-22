@@ -1,7 +1,7 @@
 "use client";
 
 import { Amplify } from "aws-amplify";
-import { forgotPassword } from "@aws-amplify/auth"; // ✅ This is the correct source
+import { resetPassword } from "@aws-amplify/auth";
 import outputs from "../../amplify_outputs.json";
 
 Amplify.configure(outputs);
@@ -20,10 +20,10 @@ export default function ForgotPasswordPage() {
     setError("");
 
     try {
-      await forgotPassword({ username: email });
-      setMessage("✅ Password reset email sent. Check your inbox.");
+      await resetPassword({ username: email });
+      setMessage("Password reset email sent. Check your inbox.");
     } catch (err: any) {
-      console.error("❌ Forgot password error:", err);
+      console.error("Forgot password error:", err);
       setError(err.message || "Something went wrong");
     }
   }
