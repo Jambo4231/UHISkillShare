@@ -11,7 +11,18 @@ import "@aws-amplify/ui-react/styles.css";
 import { useRouter } from "next/navigation";
 import "../app.css";
 
-Amplify.configure(outputs);
+Amplify.configure({
+  ...outputs,
+  Storage: {
+    S3: {
+      region: outputs.storage?.profilePicture?.region || "eu-north-1",
+      bucket:
+        outputs.storage?.profilePicture?.bucketName ||
+        "uhiskillshare-profile-pictures-jamie0a867-main",
+    },
+  },
+});
+
 const client = generateClient<Schema>();
 
 export default function ProfilePage() {
