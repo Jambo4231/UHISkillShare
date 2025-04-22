@@ -25,6 +25,7 @@ const schema = a.schema({
       college: a.string(),
       email: a.string().required(),
       areaofstudy: a.string(),
+      profilePicture: a.string(),
     })
     .authorization((allow) => [
       allow.authenticated(), // Full access for signed-in users
