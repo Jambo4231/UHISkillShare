@@ -760,7 +760,7 @@ svg {
 		justify-content:flex-start;
 	}*/
     .opensidebarbutton,
-    .closesidebarbutton,{
+    .closesidebarbutton {
       display: block;
     }
     #sidebar-active:checked ~ .sidebar {
@@ -795,5 +795,45 @@ svg {
         border-left: 2px solid var(--lightcolor);
       }
     }
+
+    .welcome-message {
+      text-align: center;
+      padding: 1rem;
+      background-color: var(--offlight);
+      color: var(--darkcolor);
+      border-bottom: 1px solid var(--darkcolor);
+    }
   }
+}
+
+.welcome-message a {
+  color: var(--applybuttoncolor);
+  text-decoration: underline;
+  margin: 0 0.5rem;
+}
+
+.welcome-message a:hover {
+  color: var(--applybuttonhover);
+}
+
+@media (prefers-color-scheme: dark) {
+  .welcome-message {
+    background-color: var(--offdark);
+    color: var(--lightcolor);
+    border-bottom: 1px solid var(--lightcolor);
+  }
+
+  .welcome-message a {
+    color: var(--accentcolor);
+  }
+
+  .welcome-message a:hover {
+    color: var(--accentcolorhover);
+  }
+}
+
+.disclaimer {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #d9534f;
 }

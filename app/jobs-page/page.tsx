@@ -52,9 +52,15 @@ export default function JobsPage() {
 
       setCurrentUserSub(sub);
 
-      const jobs = (jobRes.data ?? []).filter((j): j is NonNullable<typeof j> => j !== null);
-      const comments = (commentRes.data ?? []).filter((c): c is NonNullable<typeof c> => c !== null);
-      const users = (userRes.data ?? []).filter((u): u is NonNullable<typeof u> => u !== null);
+      const jobs = (jobRes.data ?? []).filter(
+        (j): j is NonNullable<typeof j> => j !== null
+      );
+      const comments = (commentRes.data ?? []).filter(
+        (c): c is NonNullable<typeof c> => c !== null
+      );
+      const users = (userRes.data ?? []).filter(
+        (u): u is NonNullable<typeof u> => u !== null
+      );
 
       const userMap = new Map<string, string>();
       users.forEach((user) => {
@@ -63,12 +69,15 @@ export default function JobsPage() {
         }
       });
 
-      const commentCounts = comments.reduce((acc, comment) => {
-        if (comment.jobid) {
-          acc[comment.jobid] = (acc[comment.jobid] || 0) + 1;
-        }
-        return acc;
-      }, {} as Record<string, number>);
+      const commentCounts = comments.reduce(
+        (acc, comment) => {
+          if (comment.jobid) {
+            acc[comment.jobid] = (acc[comment.jobid] || 0) + 1;
+          }
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
       const enrichedJobs = jobs.map((job) => {
         const posterUsername =
@@ -120,24 +129,12 @@ export default function JobsPage() {
   return (
     <>
       {!currentUserSub && (
-        <div
-          className="welcome-message"
-          style={{
-            textAlign: "center",
-            padding: "1rem",
-            backgroundColor: "#f3f4f6",
-            borderBottom: "1px solid #e5e7eb",
-          }}
-        >
+        <div className="welcome-message">
           <p>Welcome! Are you new here?</p>
           <p>
-            <a href="/register" style={{ color: "#2563eb", textDecoration: "underline", marginRight: "1rem" }}>
-              Register
-            </a>
+            <a href="/register">Register</a>
             or
-            <a href="/login" style={{ color: "#2563eb", textDecoration: "underline", marginLeft: "1rem" }}>
-              Login
-            </a>
+            <a href="/login">Login</a>
             to get started.
           </p>
         </div>
@@ -147,14 +144,24 @@ export default function JobsPage() {
         <div className="layout">
           <input type="checkbox" id="sidebar-active" />
           <label htmlFor="sidebar-active" className="opensidebarbutton">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="24px"
+              viewBox="0 -960 960 960"
+              width="24px"
+            >
               <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" />
             </svg>
           </label>
 
           <aside className="sidebar">
             <label htmlFor="sidebar-active" className="closesidebarbutton">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+              >
                 <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
               </svg>
             </label>
@@ -193,7 +200,10 @@ export default function JobsPage() {
                         <a
                           href={`/user-profile/${job.userid}`}
                           onClick={(e) => e.stopPropagation()}
-                          style={{ textDecoration: "underline", color: "#2563eb" }}
+                          style={{
+                            textDecoration: "underline",
+                            color: "#2563eb",
+                          }}
                         >
                           {job.posterUsername}
                         </a>
@@ -203,9 +213,13 @@ export default function JobsPage() {
                       • Subject: {job.subject || "N/A"}
                     </p>
                   </div>
-                  <p className="job-body">{truncate(job.description || "", 100)}</p>
+                  <p className="job-body">
+                    {truncate(job.description || "", 100)}
+                  </p>
                   <div className="job-footer">
-                    <span className={`status ${job.status === 1 ? "open" : "closed"}`}>
+                    <span
+                      className={`status ${job.status === 1 ? "open" : "closed"}`}
+                    >
                       {job.status === 1 ? "Unresolved" : "Resolved"}
                     </span>
                     {job.status === 1 && job.userid !== currentUserSub && (
