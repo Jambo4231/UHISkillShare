@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import { Amplify } from "aws-amplify";
-import { getCurrentUser } from "aws-amplify/auth"; 
+import { getCurrentUser } from "aws-amplify/auth";
 import type { Schema } from "@/amplify/data/resource";
 import "../app.css";
 import outputs from "@/amplify_outputs.json";
@@ -30,10 +30,14 @@ export default function CreateNewJob() {
   const [subject, setSubject] = useState(subjectOptions[0]);
   const [description, setDescription] = useState("");
   const [deadline, setDeadline] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+
+    if (loading) return;
+    setLoading(true);
 
     try {
       const { userId: sub } = await getCurrentUser();
@@ -48,7 +52,10 @@ export default function CreateNewJob() {
 
       if (!user) {
         console.error("User not found in database for sub:", sub);
-        alert("Your user profile could not be found. Please log out and try again.");
+        alert(
+          "Your user profile could not be found. Please log out and try again."
+        );
+        setLoading(false);
         return;
       }
 
@@ -68,6 +75,8 @@ export default function CreateNewJob() {
     } catch (error) {
       console.error("Error creating job:", error);
       alert("Something went wrong while creating the job.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -102,7 +111,8 @@ export default function CreateNewJob() {
           </select>
 
           <label>
-            Further Explanation and Description <span className="required">*Required</span>
+            Further Explanation and Description{" "}
+            <span className="required">*Required</span>
           </label>
           <textarea
             value={description}
@@ -110,16 +120,16 @@ export default function CreateNewJob() {
             required
           />
 
-          <label>
-            Completion Date (optional)
-          </label>
+          <label>Completion Date (optional)</label>
           <input
             type="date"
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
           />
 
-          <button type="submit">Submit</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Submitting..." : "Submit"}
+          </button>
         </form>
       </div>
     </main>
