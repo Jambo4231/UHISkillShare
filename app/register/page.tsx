@@ -21,7 +21,7 @@ export default function RegisterPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log("📤 Attempting to register:", { email, username });
+    console.log(" Attempting to register:", { email, username });
 
     try {
       const result = await signUp({
@@ -141,6 +141,11 @@ export default function RegisterPage() {
             required
             onChange={(e) => setPassword(e.target.value)}
           />
+
+          <p className="disclaimer">
+            <strong>Disclaimer:</strong> The email you register with will be
+            shared with other users when you apply for jobs.
+          </p>
 
           <button type="submit">Register</button>
         </form>
