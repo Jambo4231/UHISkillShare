@@ -5,23 +5,13 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import { Amplify } from "aws-amplify";
 import { fetchAuthSession } from "@aws-amplify/auth";
-import { uploadData, getUrl } from "aws-amplify/storage";
+import { getUrl } from "aws-amplify/storage";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import { useRouter } from "next/navigation";
 import "../app.css";
 
-Amplify.configure({
-  ...outputs,
-  Storage: {
-    S3: {
-      region: outputs.storage?.profilePicture?.region || "eu-north-1",
-      bucket:
-        outputs.storage?.profilePicture?.bucketName ||
-        "uhiskillshare-profile-pictures-jamie0a867-main",
-    },
-  },
-});
+Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
 
@@ -40,7 +30,6 @@ export default function ProfilePage() {
     number | null
   >(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     async function fetchUser() {
@@ -115,33 +104,6 @@ export default function ProfilePage() {
     fetchUser();
   }, []);
 
-  async function handleUpload(file: File) {
-    if (!user) return;
-    try {
-      setUploading(true);
-      const key = `profile-pictures/${user.sub}-${file.name}`;
-
-      await uploadData({
-        key,
-        data: file,
-        options: { contentType: file.type },
-      }).result;
-
-      await client.models.User.update({
-        id: user.id,
-        profilePicture: key,
-      });
-
-      const result = await getUrl({ key });
-      setImageUrl(result.url.href);
-    } catch (err) {
-      console.error("Upload failed:", err);
-      alert("Upload failed");
-    } finally {
-      setUploading(false);
-    }
-  }
-
   if (loading) return <p>Loading user data...</p>;
   if (error) return <p>Error: {error}</p>;
 
@@ -177,17 +139,6 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="update-profile-link">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              if (e.target.files?.[0]) handleUpload(e.target.files[0]);
-            }}
-          />
-          {uploading && <p>Uploading...</p>}
         </div>
 
         <div className="stats">
