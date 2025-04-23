@@ -5,6 +5,7 @@ import AmplifyProvider from "../components/AmplifyProvider";
 import Navbar from "../components/navbar";
 import { AuthProvider } from "../src/context/AuthContext";
 import ServiceWorker from "../components/ServiceWorker";
+import ConfigureAmplifyClient from "../components/ConfigureAmplifyClient";
 
 const nunito = Nunito_Sans({
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default function RootLayout({
     <html lang="en">
       <head />
       <body className={nunito.className}>
+        <ConfigureAmplifyClient />
         <AmplifyProvider>
           <AuthProvider>
             <Navbar />
