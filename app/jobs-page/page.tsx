@@ -8,7 +8,8 @@ import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import { useRouter } from "next/navigation";
-import { signOut, getCurrentUser } from "aws-amplify/auth";
+import { signOut } from "aws-amplify/auth";
+import { useAuth } from "../../src/context/AuthContext";
 
 Amplify.configure(outputs);
 
@@ -38,19 +39,16 @@ function truncate(text: string, maxLength: number) {
 export default function JobsPage() {
   const [jobs, setJobs] = useState<JobWithExtras[]>([]);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-  const [currentUserSub, setCurrentUserSub] = useState<string | null>(null);
+  const { userSub: currentUserSub } = useAuth();
   const router = useRouter();
 
   async function listJobs() {
     try {
-      const [{ userId: sub }, jobRes, commentRes, userRes] = await Promise.all([
-        getCurrentUser(),
+      const [jobRes, commentRes, userRes] = await Promise.all([
         client.models.Job.list(),
         client.models.Comment.list(),
         client.models.User.list(),
       ]);
-
-      setCurrentUserSub(sub);
 
       const jobs = (jobRes.data ?? []).filter(
         (j): j is NonNullable<typeof j> => j !== null
@@ -218,7 +216,9 @@ export default function JobsPage() {
                   </p>
                   <div className="job-footer">
                     <span
-                      className={`status ${job.status === 1 ? "open" : "closed"}`}
+                      className={`status ${
+                        job.status === 1 ? "open" : "closed"
+                      }`}
                     >
                       {job.status === 1 ? "Unresolved" : "Resolved"}
                     </span>
