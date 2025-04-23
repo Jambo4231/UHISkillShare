@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { getCurrentUser } from "aws-amplify/auth";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../../src/context/AuthContext";
 import { generateClient } from "aws-amplify/data";
 import "../../app.css";
 import type { Schema } from "@/amplify/data/resource";
@@ -23,9 +23,9 @@ const subjectOptions = [
 export default function ManageJobPage({ params }: { params: { id: string } }) {
   const id = params.id;
   const router = useRouter();
+  const { userSub } = useAuth();
 
-  const [userId, setUserId] = useState("");
-  const [job, setJob] = useState<any>(null);
+  const [job, setJob] = useState<Schema["Job"]["type"] | null>(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     title: "",
@@ -41,13 +41,12 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
   });
 
   useEffect(() => {
-    const fetchUserAndJob = async () => {
-      try {
-        const user = await getCurrentUser();
-        setUserId(user.userId || user.username);
+    const fetchJob = async () => {
+      if (!userSub) return;
 
-        const result = await client.models.Job.get({ id: id as string });
-        if (result?.data) {
+      try {
+        const result = await client.models.Job.get({ id });
+        if (result?.data && result.data.userid === userSub) {
           setJob(result.data);
           setFormData({
             title: result.data.title,
@@ -63,28 +62,28 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
       }
     };
 
-    fetchUserAndJob();
-  }, [id]);
+    fetchJob();
+  }, [id, userSub]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Reset error if the field is being edited
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: false }));
     }
   };
 
   const handleUpdate = async () => {
-    if (!userId || !job) {
+    if (!userSub || !job) {
       alert("User ID or job data missing. Please refresh and try again.");
       return;
     }
 
-    // Validation
     const newErrors = {
       title: !formData.title.trim(),
       description: !formData.description.trim(),
@@ -98,12 +97,12 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
     }
 
     const updatePayload = {
-      id: id as string,
+      id,
       title: formData.title,
       description: formData.description,
       subject: formData.subject,
-      deadline: formData.deadline,
-      userid: userId,
+      deadline: formData.deadline || undefined,
+      userid: userSub,
       status: job.status,
     };
 
@@ -118,14 +117,16 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
   };
 
   const handleComplete = async () => {
+    if (!userSub) return;
+
     const confirm = window.confirm("Mark job as complete?");
     if (!confirm) return;
 
     try {
       await client.models.Job.update({
-        id: id as string,
+        id,
         status: 2,
-        userid: userId,
+        userid: userSub,
       });
       alert("Job marked as complete.");
       router.push("/my-jobs");
@@ -140,7 +141,7 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
     if (!confirm) return;
 
     try {
-      await client.models.Job.delete({ id: id as string });
+      await client.models.Job.delete({ id });
       alert("Job deleted.");
       router.push("/my-jobs");
     } catch (err) {
@@ -173,7 +174,9 @@ export default function ManageJobPage({ params }: { params: { id: string } }) {
         placeholder="Job Description"
         className={errors.description ? "input-error" : ""}
       />
-      {errors.description && <p className="error-text">Description is required.</p>}
+      {errors.description && (
+        <p className="error-text">Description is required.</p>
+      )}
 
       <select
         name="subject"

@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
-import { getCurrentUser } from "aws-amplify/auth";
 import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
+import { useAuth } from "../../src/context/AuthContext";
 import "../app.css";
 
 Amplify.configure(outputs);
@@ -37,22 +37,34 @@ type CommentReplyNotification = {
 };
 
 export default function NotificationsPage() {
-  const [yourApplications, setYourApplications] = useState<YourApplication[]>([]);
-  const [applicationsToYourJobs, setApplicationsToYourJobs] = useState<ApplicationToYourJob[]>([]);
-  const [jobCommentNotifs, setJobCommentNotifs] = useState<JobCommentNotification[]>([]);
-  const [commentReplyNotifs, setCommentReplyNotifs] = useState<CommentReplyNotification[]>([]);
+  const { userSub } = useAuth();
+
+  const [yourApplications, setYourApplications] = useState<YourApplication[]>(
+    []
+  );
+  const [applicationsToYourJobs, setApplicationsToYourJobs] = useState<
+    ApplicationToYourJob[]
+  >([]);
+  const [jobCommentNotifs, setJobCommentNotifs] = useState<
+    JobCommentNotification[]
+  >([]);
+  const [commentReplyNotifs, setCommentReplyNotifs] = useState<
+    CommentReplyNotification[]
+  >([]);
 
   useEffect(() => {
     async function fetchData() {
-      try {
-        const { userId: sub } = await getCurrentUser();
+      if (!userSub) return;
 
-        const [jobsRes, acceptedRes, usersRes, commentsRes] = await Promise.all([
-          client.models.Job.list(),
-          client.models.AcceptedJob.list(),
-          client.models.User.list(),
-          client.models.Comment.list(),
-        ]);
+      try {
+        const [jobsRes, acceptedRes, usersRes, commentsRes] = await Promise.all(
+          [
+            client.models.Job.list(),
+            client.models.AcceptedJob.list(),
+            client.models.User.list(),
+            client.models.Comment.list(),
+          ]
+        );
 
         const allJobs = jobsRes.data?.filter(Boolean) ?? [];
         const allApplications = acceptedRes.data?.filter(Boolean) ?? [];
@@ -66,11 +78,9 @@ export default function NotificationsPage() {
           }
         });
 
-        // Jobs created by current user
-        const myJobs = allJobs.filter((job) => job.userid === sub);
+        const myJobs = allJobs.filter((job) => job.userid === userSub);
         const myJobIds = myJobs.map((job) => job.id);
 
-        // Applications to your jobs
         const appsToYourJobs: ApplicationToYourJob[] = allApplications
           .filter((app) => myJobIds.includes(app.jobid))
           .map((app) => {
@@ -85,9 +95,8 @@ export default function NotificationsPage() {
 
         setApplicationsToYourJobs(appsToYourJobs);
 
-        // Applications you made
         const yourApps: YourApplication[] = allApplications
-          .filter((app) => app.userid === sub)
+          .filter((app) => app.userid === userSub)
           .map((app) => {
             const job = allJobs.find((j) => j.id === app.jobid);
             return {
@@ -100,9 +109,11 @@ export default function NotificationsPage() {
 
         setYourApplications(yourApps);
 
-        // Comments on your job postings
         const jobComments: JobCommentNotification[] = allComments
-          .filter((comment) => myJobIds.includes(comment.jobid) && comment.userid !== sub)
+          .filter(
+            (comment) =>
+              myJobIds.includes(comment.jobid) && comment.userid !== userSub
+          )
           .map((comment) => {
             const job = allJobs.find((j) => j.id === comment.jobid);
             return {
@@ -114,12 +125,16 @@ export default function NotificationsPage() {
 
         setJobCommentNotifs(jobComments);
 
-        // Replies to your comments
-        const yourComments = allComments.filter((c) => c.userid === sub);
+        const yourComments = allComments.filter((c) => c.userid === userSub);
         const yourCommentIds = yourComments.map((c) => c.id);
 
         const repliesToYou: CommentReplyNotification[] = allComments
-          .filter((comment) => comment.parentid && yourCommentIds.includes(comment.parentid) && comment.userid !== sub)
+          .filter(
+            (comment) =>
+              comment.parentid &&
+              yourCommentIds.includes(comment.parentid) &&
+              comment.userid !== userSub
+          )
           .map((comment) => {
             const job = allJobs.find((j) => j.id === comment.jobid);
             return {
@@ -136,14 +151,13 @@ export default function NotificationsPage() {
     }
 
     fetchData();
-  }, []);
+  }, [userSub]);
 
   return (
     <main className="container">
       <section className="content">
         <h2>Notifications</h2>
 
-        {/* Applications to Your Jobs */}
         <div className="notif-section">
           <h3>Applications to Your Jobs</h3>
           {applicationsToYourJobs.length === 0 ? (
@@ -165,7 +179,6 @@ export default function NotificationsPage() {
           )}
         </div>
 
-        {/* Your Applications */}
         <div className="notif-section">
           <h3>Your Job Applications</h3>
           {yourApplications.length === 0 ? (
@@ -196,7 +209,6 @@ export default function NotificationsPage() {
           )}
         </div>
 
-        {/* Comments on Your Jobs */}
         <div className="notif-section">
           <h3>Comments on Your Jobs</h3>
           {jobCommentNotifs.length === 0 ? (
@@ -216,7 +228,6 @@ export default function NotificationsPage() {
           )}
         </div>
 
-        {/* Replies to Your Comments */}
         <div className="notif-section">
           <h3>Replies to Your Comments</h3>
           {commentReplyNotifs.length === 0 ? (

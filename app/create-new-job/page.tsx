@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { generateClient } from "aws-amplify/data";
 import { Amplify } from "aws-amplify";
-import { getCurrentUser } from "aws-amplify/auth";
 import type { Schema } from "@/amplify/data/resource";
 import "../app.css";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../src/context/AuthContext";
 
 Amplify.configure(outputs);
 
@@ -32,26 +32,31 @@ export default function CreateNewJob() {
   const [deadline, setDeadline] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { userSub, loading: authLoading } = useAuth();
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    if (loading) return;
+    if (loading || authLoading) return;
     setLoading(true);
 
     try {
-      const { userId: sub } = await getCurrentUser();
+      if (!userSub) {
+        alert("You're not logged in. Please log in and try again.");
+        setLoading(false);
+        return;
+      }
 
-      console.log("Looking up user with sub:", sub);
+      console.log("Looking up user with sub:", userSub);
 
       const userResult = await client.models.User.list({
-        filter: { sub: { eq: sub } },
+        filter: { sub: { eq: userSub } },
       });
 
       const user = userResult.data?.[0];
 
       if (!user) {
-        console.error("User not found in database for sub:", sub);
+        console.error("User not found in database for sub:", userSub);
         alert(
           "Your user profile could not be found. Please log out and try again."
         );
@@ -127,7 +132,7 @@ export default function CreateNewJob() {
             onChange={(e) => setDeadline(e.target.value)}
           />
 
-          <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading || authLoading}>
             {loading ? "Submitting..." : "Submit"}
           </button>
         </form>

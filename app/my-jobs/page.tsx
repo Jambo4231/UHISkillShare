@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
-import { getCurrentUser } from "aws-amplify/auth";
 import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../src/context/AuthContext";
 import "../app.css";
 
 Amplify.configure(outputs);
@@ -14,19 +14,25 @@ const client = generateClient<Schema>();
 
 export default function MyJobsPage() {
   const router = useRouter();
+  const { userSub } = useAuth();
+
   const [myJobs, setMyJobs] = useState<Schema["Job"]["type"][]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     async function fetchMyJobs() {
+      if (!userSub) {
+        setLoading(false);
+        setError("You must be logged in to view your jobs.");
+        return;
+      }
+
       try {
         setLoading(true);
 
-        const { userId: sub } = await getCurrentUser();
-
         const jobRes = await client.models.Job.list({
-          filter: { userid: { eq: sub } },
+          filter: { userid: { eq: userSub } },
         });
 
         setMyJobs(jobRes.data ?? []);
@@ -39,7 +45,7 @@ export default function MyJobsPage() {
     }
 
     fetchMyJobs();
-  }, []);
+  }, [userSub]);
 
   function handleEdit(jobId: string) {
     router.push(`/manage-jobs/${jobId}`);
@@ -57,7 +63,7 @@ export default function MyJobsPage() {
         {loading && <p>Loading...</p>}
         {error && <p className="error">{error}</p>}
 
-        {myJobs.length === 0 && !loading && (
+        {myJobs.length === 0 && !loading && !error && (
           <p>You haven't created any jobs yet.</p>
         )}
 
@@ -82,7 +88,9 @@ export default function MyJobsPage() {
               </p>
 
               <div className="job-actions">
-                <button onClick={() => handleView(job.id)}>View Applications</button>
+                <button onClick={() => handleView(job.id)}>
+                  View Applications
+                </button>
                 <button onClick={() => handleEdit(job.id)}>Manage Job</button>
               </div>
             </div>

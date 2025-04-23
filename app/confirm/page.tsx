@@ -1,12 +1,16 @@
 "use client";
 
-import { confirmSignUp, signIn, getCurrentUser } from "aws-amplify/auth";
+import {
+  confirmSignUp,
+  signIn,
+  getCurrentUser,
+  resendSignUpCode,
+} from "aws-amplify/auth";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import "../app.css";
-import { resendSignUpCode } from "aws-amplify/auth";
 
 const client = generateClient<Schema>();
 
@@ -41,18 +45,26 @@ export default function ConfirmPage() {
         email: storedEmail,
       } = parsed;
 
-      // Optional sanity check
-      if (!username || !firstname || !surname || !college || !storedEmail || !areaofstudy || !password) {
-        console.warn(" Incomplete user data:", parsed);
+      if (
+        !username ||
+        !firstname ||
+        !surname ||
+        !college ||
+        !storedEmail ||
+        !areaofstudy ||
+        !password
+      ) {
+        console.warn("Incomplete user data:", parsed);
         throw new Error("Some registration fields are missing");
       }
 
-      // Step 3: Sign in to get session (required before `getCurrentUser`)
+      // Step 3: Sign in to get session (required before getCurrentUser)
       await signIn({ username: email, password });
 
-      // Step 4: Get Cognito sub
+      // Step 4: Get Cognito sub and cache it
       const { userId: sub } = await getCurrentUser();
-      console.log(" Creating user with sub:", sub);
+      console.log("Creating user with sub:", sub);
+      localStorage.setItem("cachedSub", sub); // ✅ store for offline support
 
       // Step 5: Create user in database
       await client.models.User.create({
@@ -68,9 +80,10 @@ export default function ConfirmPage() {
       // Step 6: Clean up and redirect
       localStorage.removeItem("pendingUser");
       setSuccess(true);
-      // Signs user out before redirecting to login page
+
       setTimeout(async () => {
-        await import("aws-amplify/auth").then(({ signOut }) => signOut());
+        const { signOut } = await import("aws-amplify/auth");
+        await signOut();
         router.push("/login");
       }, 1500);
     } catch (err: any) {
@@ -81,7 +94,6 @@ export default function ConfirmPage() {
 
   return (
     <main className="container">
-
       <div className="form-container">
         <h2>Confirm Your Email</h2>
         <form onSubmit={handleSubmit}>

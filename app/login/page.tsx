@@ -41,6 +41,7 @@ export default function LoginPage() {
 
       // 👤 Step 3: Get Cognito sub
       const { userId: sub } = await getCurrentUser();
+      localStorage.setItem("cachedSub", sub); // ✅ store for offline use
 
       // 🔍 Step 4: Check for existing user in DB
       const result = await client.models.User.list({
@@ -98,7 +99,6 @@ export default function LoginPage() {
 
         {error && <p style={{ color: "red" }}>{error}</p>}
 
-        {/* Forgot Password Link */}
         <p style={{ marginTop: "1rem" }}>
           <Link
             href="/forgot-password"
@@ -108,7 +108,6 @@ export default function LoginPage() {
           </Link>
         </p>
 
-        {/* Register Link */}
         <p style={{ marginTop: "1rem" }}>
           Don&apos;t have an account?{" "}
           <Link

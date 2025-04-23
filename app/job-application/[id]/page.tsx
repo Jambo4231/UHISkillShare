@@ -6,17 +6,23 @@ import { useRouter } from "next/navigation";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import { Amplify } from "aws-amplify";
-import { getCurrentUser } from "aws-amplify/auth";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 import "../../app.css";
+import { useAuth } from "../../../src/context/AuthContext";
 
 Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
 
-export default function JobApplicationPage({ params }: { params: { id: string } }) {
+export default function JobApplicationPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const router = useRouter();
+  const { userSub } = useAuth();
+
   const [job, setJob] = useState<Schema["Job"]["type"] | null>(null);
   const [posterUsername, setPosterUsername] = useState("Loading...");
   const [posterSub, setPosterSub] = useState<string | null>(null);
@@ -63,21 +69,20 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
 
   useEffect(() => {
     async function checkIfOwnOrAlreadyApplied() {
-      if (!job) return;
+      if (!job || !userSub) return;
+
+      // Check if user is the job poster
+      if (job.userid === userSub) {
+        setIsOwnJob(true);
+        return;
+      }
+
+      // Check for existing application
       try {
-        const { userId: sub } = await getCurrentUser();
-
-        // Check if applying to own job
-        if (job.userid === sub) {
-          setIsOwnJob(true);
-          return;
-        }
-
-        // Check for existing application
         const existing = await client.models.AcceptedJob.list({
           filter: {
             jobid: { eq: job.id },
-            userid: { eq: sub },
+            userid: { eq: userSub },
           },
         });
 
@@ -85,20 +90,18 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
           setHasApplied(true);
         }
       } catch (error) {
-        console.error("Error checking for application or ownership:", error);
+        console.error("Error checking for application:", error);
       }
     }
+
     checkIfOwnOrAlreadyApplied();
-  }, [job]);
+  }, [job, userSub]);
 
   async function handleJobSubmit() {
-    if (!job) return;
+    if (!job || !userSub) return;
 
     try {
-      const { userId: sub } = await getCurrentUser();
-
-      // Check again before submitting just in case
-      if (job.userid === sub) {
+      if (job.userid === userSub) {
         alert("You cannot apply to your own job.");
         return;
       }
@@ -106,7 +109,7 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
       const existing = await client.models.AcceptedJob.list({
         filter: {
           jobid: { eq: job.id },
-          userid: { eq: sub },
+          userid: { eq: userSub },
         },
       });
 
@@ -118,7 +121,7 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
 
       await client.models.AcceptedJob.create({
         jobid: job.id,
-        userid: sub,
+        userid: userSub,
         applytext: applicationMessage,
       });
 
@@ -142,7 +145,9 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
           Posted by:{" "}
           {posterSub ? (
             <Link href={`/user-profile/${posterSub}`}>
-              <strong className="hover:underline cursor-pointer">{posterUsername}</strong>
+              <strong className="hover:underline cursor-pointer">
+                {posterUsername}
+              </strong>
             </Link>
           ) : (
             <strong>{posterUsername}</strong>
@@ -150,21 +155,25 @@ export default function JobApplicationPage({ params }: { params: { id: string } 
           • {job.subject || "No Subject"}
         </p>
         <p className="job-body">
-          Do you wish to apply for this job? If the job poster accepts your application,
-          your UHI email addresses will be shared with each other to allow for further
-          communication.
+          Do you wish to apply for this job? If the job poster accepts your
+          application, your UHI email addresses will be shared with each other
+          to allow for further communication.
         </p>
 
         <div className="comment-section">
           <h3>
-            If you have not already communicated in comments, you may choose to provide
-            information or explanation here so that the job poster can see why your
-            application is relevant to their issue.
+            If you have not already communicated in comments, you may choose to
+            provide information or explanation here so that the job poster can
+            see why your application is relevant to their issue.
           </h3>
-          {isOwnJob ? (
+          {!userSub ? (
+            <p className="info-message">Please log in to apply for this job.</p>
+          ) : isOwnJob ? (
             <p className="info-message">You cannot apply to your own job.</p>
           ) : hasApplied ? (
-            <p className="info-message">You have already applied for this job.</p>
+            <p className="info-message">
+              You have already applied for this job.
+            </p>
           ) : (
             <>
               <textarea

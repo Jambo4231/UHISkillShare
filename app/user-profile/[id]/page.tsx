@@ -6,18 +6,22 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
+import { useAuth } from "../../../src/context/AuthContext";
 import "@aws-amplify/ui-react/styles.css";
 import "../../app.css";
-import { getCurrentUser } from "aws-amplify/auth";
 
 Amplify.configure(outputs);
 const client = generateClient<Schema>();
 
-export default function PublicUserProfile({ params }: { params: { id: string } }) {
+export default function PublicUserProfile({
+  params,
+}: {
+  params: { id: string };
+}) {
   const viewedUserSub = params.id;
   const router = useRouter();
+  const { userSub } = useAuth();
 
-  const [currentUserId, setCurrentUserId] = useState("");
   const [user, setUser] = useState<Schema["User"]["type"] | null>(null);
   const [averageRating, setAverageRating] = useState<number | null>(null);
   const [yourRating, setYourRating] = useState<number | null>(null);
@@ -25,10 +29,9 @@ export default function PublicUserProfile({ params }: { params: { id: string } }
 
   useEffect(() => {
     async function fetchUserData() {
-      try {
-        const current = await getCurrentUser();
-        setCurrentUserId(current.userId);
+      if (!userSub) return;
 
+      try {
         const userRes = await client.models.User.list({
           filter: { sub: { eq: viewedUserSub } },
         });
@@ -56,7 +59,7 @@ export default function PublicUserProfile({ params }: { params: { id: string } }
         const yourRatingRes = await client.models.Rating.list({
           filter: {
             rateduserid: { eq: viewedUserSub },
-            ratinguserid: { eq: current.userId },
+            ratinguserid: { eq: userSub },
           },
         });
 
@@ -69,16 +72,16 @@ export default function PublicUserProfile({ params }: { params: { id: string } }
     }
 
     fetchUserData();
-  }, [viewedUserSub]);
+  }, [viewedUserSub, userSub]);
 
   async function handleRateUser(rating: number) {
     try {
-      if (currentUserId === viewedUserSub) return alert("You can't rate yourself.");
+      if (userSub === viewedUserSub) return alert("You can't rate yourself.");
 
       const existingRes = await client.models.Rating.list({
         filter: {
           rateduserid: { eq: viewedUserSub },
-          ratinguserid: { eq: currentUserId },
+          ratinguserid: { eq: userSub },
         },
       });
 
@@ -88,9 +91,9 @@ export default function PublicUserProfile({ params }: { params: { id: string } }
         await client.models.Rating.update({ id: existing.id, rating });
       } else {
         await client.models.Rating.create({
-          jobid: "n/a", 
+          jobid: "n/a",
           rateduserid: viewedUserSub,
-          ratinguserid: currentUserId,
+          ratinguserid: userSub,
           rating,
         });
       }
@@ -119,20 +122,34 @@ export default function PublicUserProfile({ params }: { params: { id: string } }
           />
 
           <div className="user-info">
-            <p><strong>Screen Name:</strong> {user.username}</p>
-            <p><strong>Name:</strong> {[user.firstname, user.surname].filter(Boolean).join(" ")}</p>
-            <p><strong>College:</strong> {user.college || "N/A"}</p>
-            <p><strong>Area of Study:</strong> {user.areaofstudy || "N/A"}</p>
+            <p>
+              <strong>Screen Name:</strong> {user.username}
+            </p>
+            <p>
+              <strong>Name:</strong>{" "}
+              {[user.firstname, user.surname].filter(Boolean).join(" ")}
+            </p>
+            <p>
+              <strong>College:</strong> {user.college || "N/A"}
+            </p>
+            <p>
+              <strong>Area of Study:</strong> {user.areaofstudy || "N/A"}
+            </p>
 
-            <p className="mt-3"><strong>Average Rating:</strong> 
+            <p className="mt-3">
+              <strong>Average Rating:</strong>
               <span className="stars">
-                {averageRating !== null ? " ⭐".repeat(averageRating) : " No Ratings"}
+                {averageRating !== null
+                  ? " ⭐".repeat(averageRating)
+                  : " No Ratings"}
               </span>
             </p>
 
-            {currentUserId !== viewedUserSub && (
+            {userSub !== viewedUserSub && (
               <div className="rate-user mt-3">
-                <p><strong>Rate this user:</strong></p>
+                <p>
+                  <strong>Rate this user:</strong>
+                </p>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <span
                     key={star}
