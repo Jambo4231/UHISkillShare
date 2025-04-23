@@ -1,8 +1,8 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth"; // Your previous working imports
-import { Hub } from "aws-amplify/utils"; // Correct import for Hub
+import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
+import { Hub } from "aws-amplify/utils";
 
 type AuthContextType = {
   isLoggedIn: boolean;
@@ -21,12 +21,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Function to check the user session, including offline handling
   const checkUser = async () => {
     try {
-      // First, try fetching the auth session
       await fetchAuthSession();
       await getCurrentUser();
       setIsLoggedIn(true);
-    } catch {
-      setIsLoggedIn(false);
+    } catch (err) {
+      if (!navigator.onLine) {
+        console.warn("Offline mode: assuming user is still logged in.");
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
     } finally {
       setLoading(false);
     }
@@ -39,8 +43,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       checkUser(); // Update login state on auth changes
     });
 
-    // Cleanup listener on component unmount
-    return () => unsubscribe();
+    return () => unsubscribe(); // Cleanup listener on component unmount
   }, []);
 
   return (
