@@ -29,7 +29,7 @@ export default function PublicUserProfile({
 
   useEffect(() => {
     async function fetchUserData() {
-      if (!userSub) return;
+      if (!userSub || !viewedUserSub) return;
 
       try {
         const userRes = await client.models.User.list({
@@ -75,9 +75,17 @@ export default function PublicUserProfile({
   }, [viewedUserSub, userSub]);
 
   async function handleRateUser(rating: number) {
-    try {
-      if (userSub === viewedUserSub) return alert("You can't rate yourself.");
+    if (!userSub || !viewedUserSub) {
+      alert("Cannot rate without valid user IDs.");
+      return;
+    }
 
+    if (userSub === viewedUserSub) {
+      alert("You can't rate yourself.");
+      return;
+    }
+
+    try {
       const existingRes = await client.models.Rating.list({
         filter: {
           rateduserid: { eq: viewedUserSub },
